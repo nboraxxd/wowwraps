@@ -2,7 +2,7 @@ import { toast } from 'sonner'
 import { UseFormSetError } from 'react-hook-form'
 
 import { EntityError } from '@/utils/http'
-import { isClient } from '@/utils'
+import { isBrowser } from '@/utils'
 
 export const handleErrorApi = ({ error, setError }: { error: any; setError?: UseFormSetError<any> }) => {
   if (error instanceof EntityError && setError) {
@@ -12,7 +12,7 @@ export const handleErrorApi = ({ error, setError }: { error: any; setError?: Use
   } else if (error instanceof DOMException) {
     console.log('AbortError:', error.message)
   } else {
-    if (isClient) {
+    if (isBrowser) {
       toast.error(error.payload?.message || error.toString())
     } else {
       console.log(error)

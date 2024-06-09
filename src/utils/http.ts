@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 
 import envConfig from '@/constants/config'
 import { LoginResType } from '@/lib/schemaValidations/auth.schema'
-import { isClient, addFirstSlashToUrl } from '@/utils'
+import { isBrowser, addFirstSlashToUrl } from '@/utils'
 import {
   getAccessTokenFromLocalStorage,
   removeTokensFromLocalStorage,
@@ -63,7 +63,7 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
 
   const fullUrl = `${baseUrl}${addFirstSlashToUrl(url)}`
 
-  if (isClient) {
+  if (isBrowser) {
     const accessToken = getAccessTokenFromLocalStorage()
 
     if (accessToken) {
@@ -93,7 +93,7 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
     if (res.status === ENTITY_ERROR_STATUS) {
       throw new EntityError(data.payload as EntityErrorPayload)
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
-      if (isClient && !clientLogoutRequest) {
+      if (isBrowser && !clientLogoutRequest) {
         // Gọi đến Next.js API route để logout
         clientLogoutRequest = fetch('/api/auth/logout', {
           method: 'POST',
@@ -117,7 +117,7 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
         }
       }
 
-      if (!isClient) {
+      if (!isBrowser) {
         const accessToken = options?.headers?.Authorization?.split('Bearer ')[1]
 
         redirect(`/logout?accessToken=${accessToken}`)
@@ -128,14 +128,14 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
   }
 
   // Client gọi đến Next.js API route để login
-  if (isClient && addFirstSlashToUrl(url) === '/api/auth/login') {
+  if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/login') {
     const { accessToken, refreshToken } = (payload as LoginResType).data
 
     setAccessTokenToLocalStorage(accessToken)
     setRefreshTokenToLocalStorage(refreshToken)
 
     // Client gọi đến Next.js API route để logout
-  } else if (isClient && addFirstSlashToUrl(url) === '/api/auth/logout') {
+  } else if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/logout') {
     removeTokensFromLocalStorage()
   }
 

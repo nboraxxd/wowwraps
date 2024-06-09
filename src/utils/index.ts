@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const isClient = typeof window !== 'undefined'
+export const isBrowser = typeof window !== 'undefined'
 
 export const addFirstSlashToUrl = (url: string) => {
   return url.startsWith('/') ? url : `/${url}`
