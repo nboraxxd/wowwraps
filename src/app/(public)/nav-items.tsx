@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
+import { useAuthStore } from '@/lib/stores/auth-store'
 import { getAccessTokenFromLocalStorage } from '@/utils/token'
 
 // authRequired = undefined: always show
@@ -31,14 +32,15 @@ const menuItems = [
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const [isAuth, setIsAuth] = useState(false)
+  const isAuth = useAuthStore((state) => state.isAuth)
+  const setIsAuth = useAuthStore((state) => state.setIsAuth)
 
   useEffect(() => {
     setIsAuth(Boolean(getAccessTokenFromLocalStorage()))
-  }, [])
+  }, [setIsAuth])
 
   return menuItems.map((item) =>
-    item.authRequired === undefined || (item.authRequired && isAuth) || (!item.authRequired && !isAuth) ? (
+    item.authRequired === undefined || (!isAuth && !item.authRequired) || (isAuth && item.authRequired) ? (
       <Link href={item.href} key={item.href} className={className}>
         {item.title}
       </Link>

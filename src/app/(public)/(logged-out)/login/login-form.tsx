@@ -1,10 +1,11 @@
 'use client'
 
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { handleErrorApi } from '@/utils/error'
+import { useAuthStore } from '@/lib/stores/auth-store'
 import { useNLoginMutation } from '@/lib/tanstack-query/use-auth'
 import { LoginBody, LoginBodyType } from '@/lib/schemaValidations/auth.schema'
 import { Label } from '@/components/ui/label'
@@ -14,6 +15,10 @@ import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function LoginForm() {
+  const router = useRouter()
+
+  const setIsAuth = useAuthStore((state) => state.setIsAuth)
+
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -29,7 +34,9 @@ export default function LoginForm() {
 
     nLoginMutation.mutate(values, {
       onSuccess: () => {
-        toast.success('Login success')
+        setIsAuth(true)
+        router.push('/')
+        router.refresh()
       },
       onError: (error) => {
         handleErrorApi({ error, setError: form.setError })
