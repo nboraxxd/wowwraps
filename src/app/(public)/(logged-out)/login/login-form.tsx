@@ -1,8 +1,11 @@
 'use client'
 
+import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { handleErrorApi } from '@/utils/error'
+import { useNLoginMutation } from '@/lib/tanstack-query/use-auth'
 import { LoginBody, LoginBodyType } from '@/lib/schemaValidations/auth.schema'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -19,8 +22,19 @@ export default function LoginForm() {
     },
   })
 
+  const nLoginMutation = useNLoginMutation()
+
   function onValid(values: LoginBodyType) {
-    console.log(values)
+    if (nLoginMutation.isPending) return
+
+    nLoginMutation.mutate(values, {
+      onSuccess: () => {
+        toast.success('Login success')
+      },
+      onError: (error) => {
+        handleErrorApi({ error, setError: form.setError })
+      },
+    })
   }
 
   return (
