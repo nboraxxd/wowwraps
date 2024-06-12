@@ -1,4 +1,4 @@
-export default function FullLogo(props: React.ComponentPropsWithoutRef<'svg'>) {
+export default function FullLogoIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="199" height="48" viewBox="0 0 199 48" fill="none" {...props}>
       <g clipPath="url(#clip0_2129_606)">
