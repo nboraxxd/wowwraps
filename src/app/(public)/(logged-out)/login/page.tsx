@@ -1,4 +1,4 @@
-import LoginForm from '@/app/(public)/(logged-out)/login/login-form'
+import LoginForm from '@/components/form/login-form'
 
 export default function LoginPage() {
   return (

@@ -1,5 +1,4 @@
-import NavLinks from '@/app/manage/nav-links'
-import MobileNavLinks from '@/app/manage/mobile-nav-links'
+import { MobileNavLinks, NavLinks } from '@/app/manage/_components'
 import { DarkModeToggle, DropdownAvatar } from '@/components/common'
 
 type Props = Readonly<{

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Settings } from 'lucide-react'
 
 import { cn } from '@/utils'
-import menuItems from '@/app/manage/menuItems'
+import { menuItems } from '@/constants/list'
 import { LogoIcon } from '@/components/icons'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 

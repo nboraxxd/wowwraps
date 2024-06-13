@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation'
 import { PanelLeft } from 'lucide-react'
 
 import { cn } from '@/utils'
-import menuItems from '@/app/manage/menuItems'
+import { menuItems } from '@/constants/list'
+import { LogoIcon } from '@/components/icons'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { LogoIcon } from '@/components/icons'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
