@@ -1,14 +1,27 @@
 import http from '@/utils/http'
-import { LoginBodyType, LoginResType } from '@/lib/schemaValidations/auth.schema'
 import envConfig from '@/constants/config'
+import { MessageResType } from '@/lib/schemaValidations/common.schema'
+import { LoginBodyType, LoginResType, LogoutBodyType } from '@/lib/schemaValidations/auth.schema'
 
 const authApi = {
-  // API of backend server
+  // API OF BACKEND SERVER
   bLogin: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
 
-  // API of Next.js server
+  // bLogout sẽ được gọi từ Next.js server nên cần tự thêm accessToken vào headers.Authorization
+  bLogout: ({ accessToken, refreshToken }: LogoutBodyType & { accessToken: string }) =>
+    http.post<MessageResType>(
+      '/auth/logout',
+      { refreshToken },
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    ),
+
+  // API OF NEXT.JS SERVER
   nLogin: (body: LoginBodyType) =>
     http.post<LoginResType>('/api/auth/login', body, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
+
+  // nLogout sẽ được gọi từ Next.js client nên không cần truyền accessToken và refreshToken
+  // vì nó sẽ tự động gởi thông qua cookie
+  nLogout: () => http.post<MessageResType>('/api/auth/logout', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
 }
 
 export default authApi

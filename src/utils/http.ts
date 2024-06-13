@@ -8,7 +8,7 @@ import {
   removeTokensFromLocalStorage,
   setAccessTokenToLocalStorage,
   setRefreshTokenToLocalStorage,
-} from '@/utils/token'
+} from '@/utils/local-storage'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
   baseUrl?: string
@@ -17,15 +17,24 @@ type CustomOptions = Omit<RequestInit, 'method'> & {
 
 type CustomOptionsExcluedBody = Omit<CustomOptions, 'body'>
 
-const ENTITY_ERROR_STATUS = 422
-const AUTHENTICATION_ERROR_STATUS = 401
-
 type EntityErrorPayload = {
   message: string
   errors: {
     field: string
     message: string
   }[]
+}
+
+const ENTITY_ERROR_STATUS = 422
+const AUTHENTICATION_ERROR_STATUS = 401
+
+let clientLogoutRequest: Promise<any> | null = null
+
+let accessToken: string | null = getAccessTokenFromLocalStorage()
+console.log('🔥 ~ accessToken_before:', accessToken)
+
+export function removeTokensFromHttp() {
+  accessToken = null
 }
 
 export class HttpError extends Error {
@@ -52,8 +61,6 @@ export class EntityError extends HttpError {
   }
 }
 
-let clientLogoutRequest: Promise<any> | null = null
-
 const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, options?: CustomOptions) => {
   const body = options?.body instanceof FormData ? options.body : JSON.stringify(options?.body)
 
@@ -64,7 +71,8 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
   const fullUrl = `${baseUrl}${addFirstSlashToUrl(url)}`
 
   if (isBrowser) {
-    const accessToken = getAccessTokenFromLocalStorage()
+    console.log('🔥 ~ request ~ accessToken_after:', accessToken)
+    accessToken = accessToken || getAccessTokenFromLocalStorage()
 
     if (accessToken) {
       baseHeaders.Authorization = `Bearer ${accessToken}`
@@ -129,10 +137,11 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
 
   // Client gọi đến Next.js API route để login
   if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/login') {
-    const { accessToken, refreshToken } = (payload as LoginResType).data
+    const { accessToken: responseAccessToken, refreshToken: responseRefreshToken } = (payload as LoginResType).data
 
-    setAccessTokenToLocalStorage(accessToken)
-    setRefreshTokenToLocalStorage(refreshToken)
+    setAccessTokenToLocalStorage(responseAccessToken)
+    setRefreshTokenToLocalStorage(responseRefreshToken)
+    accessToken = responseAccessToken
 
     // Client gọi đến Next.js API route để logout
   } else if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/logout') {
