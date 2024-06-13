@@ -1,10 +1,11 @@
 import z from 'zod'
+import { RoleValues } from '@/constants/type'
 
 export const AccountSchema = z.object({
   id: z.number(),
   name: z.string(),
   email: z.string(),
-  role: z.string(),
+  role: z.enum(RoleValues),
   avatar: z.string().nullable(),
 })
 

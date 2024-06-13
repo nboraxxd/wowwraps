@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
+import { useGetMe } from '@/lib/tanstack-query/use-account'
 import { useNLogoutMutation } from '@/lib/tanstack-query/use-auth'
 import {
   DropdownMenu,
@@ -17,17 +18,20 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-
-const account = {
-  name: 'Nguyễn Văn A',
-  avatar: 'https://i.pravatar.cc/150',
-}
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function DropdownAvatar() {
   const router = useRouter()
 
   const setMe = useAuthStore((state) => state.setMe)
+  const isAuth = useAuthStore((state) => state.isAuth)
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
+
+  const {
+    data: getMeResponse,
+    isLoading: isLoadingGetMe,
+    isSuccess: isSuccessGetMe,
+  } = useGetMe({ enabled: isAuth, onSuccess: (data) => setMe(data.data) })
 
   const nLogoutMutation = useNLogoutMutation()
 
@@ -48,18 +52,20 @@ export default function DropdownAvatar() {
     })
   }
 
-  return (
+  if (isLoadingGetMe) return <Skeleton className="size-9 rounded-full" />
+
+  return isAuth && isSuccessGetMe ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
           <Avatar>
-            <AvatarImage src={account.avatar ?? undefined} alt={account.name} />
-            <AvatarFallback>{account.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+            <AvatarImage src={getMeResponse.payload.data.avatar ?? undefined} alt={getMeResponse.payload.data.name} />
+            <AvatarFallback>{getMeResponse.payload.data.name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
+        <DropdownMenuLabel>{getMeResponse.payload.data.name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={'/manage/setting'} className="cursor-pointer">
@@ -73,5 +79,5 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  ) : null
 }

@@ -1,4 +1,5 @@
 export const QueryKey = {
-  NLogin: 'NLogin',
-  NLogout: 'NLogout',
+  nLogin: 'bLogin',
+  nLogout: 'bLogout',
+  bGetMe: 'bGetMe',
 } as const
