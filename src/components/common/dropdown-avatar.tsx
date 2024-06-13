@@ -1,7 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
+import { handleErrorApi } from '@/utils/error'
+import { useAuthStore } from '@/lib/stores/auth-store'
+import { useNLogoutMutation } from '@/lib/tanstack-query/use-auth'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +24,30 @@ const account = {
 }
 
 export default function DropdownAvatar() {
+  const router = useRouter()
+
+  const setMe = useAuthStore((state) => state.setMe)
+  const setIsAuth = useAuthStore((state) => state.setIsAuth)
+
+  const nLogoutMutation = useNLogoutMutation()
+
+  function handleLogout() {
+    if (nLogoutMutation.isPending) return
+
+    nLogoutMutation.mutate(undefined, {
+      onSuccess: (response) => {
+        setIsAuth(false)
+        setMe(null)
+        toast(response.payload.message)
+
+        router.refresh()
+      },
+      onError: (error) => {
+        handleErrorApi({ error })
+      },
+    })
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,7 +68,9 @@ export default function DropdownAvatar() {
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer">Hỗ trợ</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">Đăng xuất</DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+          Đăng xuất
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

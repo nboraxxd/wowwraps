@@ -31,11 +31,7 @@ const AUTHENTICATION_ERROR_STATUS = 401
 let clientLogoutRequest: Promise<any> | null = null
 
 let accessToken: string | null = getAccessTokenFromLocalStorage()
-console.log('🔥 ~ accessToken_before:', accessToken)
-
-export function removeTokensFromHttp() {
-  accessToken = null
-}
+console.log('🔥 ~ accessToken_initial:', accessToken)
 
 export class HttpError extends Error {
   status: number
@@ -70,13 +66,9 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
 
   const fullUrl = `${baseUrl}${addFirstSlashToUrl(url)}`
 
-  if (isBrowser) {
-    console.log('🔥 ~ request ~ accessToken_after:', accessToken)
-    accessToken = accessToken || getAccessTokenFromLocalStorage()
-
-    if (accessToken) {
-      baseHeaders.Authorization = `Bearer ${accessToken}`
-    }
+  console.log('🔥 ~ request ~ accessToken_request:', accessToken)
+  if (isBrowser && accessToken) {
+    baseHeaders.Authorization = `Bearer ${accessToken}`
   }
 
   const res = await fetch(fullUrl, {
@@ -142,10 +134,13 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
     setAccessTokenToLocalStorage(responseAccessToken)
     setRefreshTokenToLocalStorage(responseRefreshToken)
     accessToken = responseAccessToken
+    console.log('🔥 ~ accessToken_loggedIn:', accessToken)
 
     // Client gọi đến Next.js API route để logout
   } else if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/logout') {
     removeTokensFromLocalStorage()
+    accessToken = null
+    console.log('🔥 ~ accessToken_loggedOut:', accessToken)
   }
 
   return data

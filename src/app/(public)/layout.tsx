@@ -3,7 +3,7 @@ import { Menu } from 'lucide-react'
 
 import NavItems from '@/app/(public)/nav-items'
 import { LogoIcon } from '@/components/icons'
-import { DarkModeToggle } from '@/components/common'
+import { DarkModeToggle, DropdownAvatar } from '@/components/common'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
@@ -44,9 +44,9 @@ export default function Layout({
           </SheetContent>
         </Sheet>
 
-        {/* Dark mode toggle */}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-4">
           <DarkModeToggle />
+          <DropdownAvatar />
         </div>
       </header>
 

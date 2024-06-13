@@ -1,7 +1,6 @@
 import NavLinks from '@/app/manage/nav-links'
-import DropdownAvatar from '@/app/manage/dropdown-avatar'
 import MobileNavLinks from '@/app/manage/mobile-nav-links'
-import { DarkModeToggle } from '@/components/common'
+import { DarkModeToggle, DropdownAvatar } from '@/components/common'
 
 type Props = Readonly<{
   children: React.ReactNode

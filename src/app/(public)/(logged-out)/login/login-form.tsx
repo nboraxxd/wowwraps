@@ -18,6 +18,7 @@ export default function LoginForm() {
   const router = useRouter()
 
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
+  const setMe = useAuthStore((state) => state.setMe)
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -33,8 +34,9 @@ export default function LoginForm() {
     if (nLoginMutation.isPending) return
 
     nLoginMutation.mutate(values, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         setIsAuth(true)
+        setMe(response.payload.data.account)
         router.push('/')
         router.refresh()
       },
