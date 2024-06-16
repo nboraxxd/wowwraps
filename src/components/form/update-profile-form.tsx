@@ -1,8 +1,12 @@
 'use client'
+
 import { Upload } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { useAuthStore } from '@/lib/stores/auth-store'
+import { useGetMe } from '@/lib/tanstack-query/use-account'
 import { UpdateMeBody, UpdateMeBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +16,16 @@ import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function UpdateProfileForm() {
+  const [file, setFile] = useState<File | null>(null)
+
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  const isAuth = useAuthStore((state) => state.isAuth)
+
+  const { data: getMeResponse, isSuccess: isSuccessGetMe } = useGetMe({
+    enabled: isAuth,
+  })
+
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
@@ -19,6 +33,29 @@ export default function UpdateProfileForm() {
       avatar: '',
     },
   })
+
+  const avatar = form.watch('avatar')
+  const name = form.watch('name')
+
+  const previewAvatar = useMemo(() => {
+    if (file) {
+      return URL.createObjectURL(file)
+    }
+    return avatar
+  }, [avatar, file])
+
+  useEffect(() => {
+    isSuccessGetMe &&
+      form.reset({ name: getMeResponse.payload.data.name, avatar: getMeResponse.payload.data.avatar ?? '' })
+  }, [form, getMeResponse?.payload.data.avatar, getMeResponse?.payload.data.name, isSuccessGetMe])
+
+  function onChangeAvatarInput(ev: React.ChangeEvent<HTMLInputElement>) {
+    const file = ev.target.files?.[0]
+
+    if (file) {
+      setFile(file)
+    }
+  }
 
   return (
     <Form {...form}>
@@ -36,13 +73,20 @@ export default function UpdateProfileForm() {
                   <FormItem>
                     <div className="flex items-start justify-start gap-2">
                       <Avatar className="aspect-square size-[100px] rounded-md object-cover">
-                        <AvatarImage src={'Duoc'} />
-                        <AvatarFallback className="rounded-none">{'duoc'}</AvatarFallback>
+                        <AvatarImage src={previewAvatar} />
+                        <AvatarFallback className="rounded-none">{name}</AvatarFallback>
                       </Avatar>
-                      <input type="file" accept="image/*" className="hidden" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={avatarInputRef}
+                        onChange={onChangeAvatarInput}
+                      />
                       <button
                         className="flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed"
                         type="button"
+                        onClick={() => avatarInputRef.current?.click()}
                       >
                         <Upload className="size-4 text-muted-foreground" />
                         <span className="sr-only">Upload</span>

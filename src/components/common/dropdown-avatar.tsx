@@ -54,7 +54,7 @@ export default function DropdownAvatar() {
 
   if (isLoadingGetMe) return <Skeleton className="size-9 rounded-full" />
 
-  return isAuth && isSuccessGetMe ? (
+  return isSuccessGetMe ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="overflow-hidden rounded-full">

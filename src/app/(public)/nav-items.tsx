@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { getAccessTokenFromLocalStorage } from '@/utils/local-storage'
 
 // authRequired = undefined: always show
 // authRequired = false: only show when user is not authenticated
@@ -33,17 +32,12 @@ const menuItems = [
 
 export default function NavItems({ className }: { className?: string }) {
   const isAuth = useAuthStore((state) => state.isAuth)
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
 
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  useEffect(() => {
-    setIsAuth(Boolean(getAccessTokenFromLocalStorage()))
-  }, [setIsAuth])
 
   if (!mounted) return null
 

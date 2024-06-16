@@ -1,11 +1,11 @@
 import { MobileNavLinks, NavLinks } from '@/app/manage/_components'
 import { DarkModeToggle, DropdownAvatar } from '@/components/common'
 
-type Props = Readonly<{
+export default function Layout({
+  children,
+}: Readonly<{
   children: React.ReactNode
-}>
-
-export default function Layout({ children }: Props) {
+}>) {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <NavLinks />
