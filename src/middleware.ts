@@ -1,21 +1,32 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const loggedInPaths = ['/manage']
-const loggedOutPaths = ['/login']
+const authorizedPaths = ['/manage']
+const unauthenticatedPaths = ['/login']
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const isAuth = Boolean(request.cookies.get('accessToken')?.value)
+  const accessToken = request.cookies.get('accessToken')?.value
+  const refreshToken = request.cookies.get('refreshToken')?.value
 
-  if (loggedInPaths.some((item) => pathname.startsWith(item)) && !isAuth) {
+  // Redirect to login page if doesn't have refresh token
+  if (authorizedPaths.some((item) => pathname.startsWith(item)) && !refreshToken) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (loggedOutPaths.some((item) => pathname.startsWith(item)) && isAuth) {
+  // Redirect to home page if has refresh token
+  if (unauthenticatedPaths.some((item) => pathname.startsWith(item)) && refreshToken) {
     return NextResponse.redirect(new URL('/', request.url))
+  }
+
+  // Logged in but access token has expired
+  if (authorizedPaths.some((item) => pathname.startsWith(item)) && refreshToken && !accessToken) {
+    const logoutUrl = new URL('/logout', request.url)
+    logoutUrl.searchParams.set('refresh-token', refreshToken)
+
+    return NextResponse.redirect(logoutUrl)
   }
 
   return NextResponse.next()

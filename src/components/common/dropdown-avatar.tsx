@@ -35,26 +35,25 @@ export default function DropdownAvatar() {
 
   const nLogoutMutation = useNLogoutMutation()
 
-  function handleLogout() {
+  async function handleLogout() {
     if (nLogoutMutation.isPending) return
 
-    nLogoutMutation.mutate(undefined, {
-      onSuccess: (response) => {
-        setIsAuth(false)
-        setMe(null)
-        toast(response.payload.message)
+    try {
+      const response = await nLogoutMutation.mutateAsync()
 
-        router.refresh()
-      },
-      onError: (error) => {
-        handleErrorApi({ error })
-      },
-    })
+      setIsAuth(false)
+      setMe(null)
+      toast(response.payload.message)
+
+      router.refresh()
+    } catch (error) {
+      handleErrorApi({ error })
+    }
   }
 
   if (isLoadingGetMe) return <Skeleton className="size-9 rounded-full" />
 
-  return isSuccessGetMe ? (
+  return isAuth && isSuccessGetMe ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="overflow-hidden rounded-full">
