@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 import accountApi from '@/api-requests/account.api'
 import { QueryKey } from '@/constants/query-key'
@@ -18,5 +18,12 @@ export function useGetMe({ onSuccess, enabled = true }: GetMeQueryOptions) {
       }),
     queryKey: [QueryKey.bGetMe],
     enabled,
+  })
+}
+
+export function useUpdateMe() {
+  return useMutation({
+    mutationFn: accountApi.bUpadateMe,
+    mutationKey: [QueryKey.bUpdateMe],
   })
 }

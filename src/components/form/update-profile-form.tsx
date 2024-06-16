@@ -1,12 +1,15 @@
 'use client'
 
-import { Upload } from 'lucide-react'
+import { toast } from 'sonner'
+import { LoaderCircleIcon, Upload } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useGetMe } from '@/lib/tanstack-query/use-account'
+import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
+import { useGetMe, useUpdateMe } from '@/lib/tanstack-query/use-account'
 import { UpdateMeBody, UpdateMeBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,9 +25,17 @@ export default function UpdateProfileForm() {
 
   const isAuth = useAuthStore((state) => state.isAuth)
 
-  const { data: getMeResponse, isSuccess: isSuccessGetMe } = useGetMe({
+  const {
+    data: getMeResponse,
+    isSuccess: isSuccessGetMe,
+    refetch: refreshGetMe,
+  } = useGetMe({
     enabled: isAuth,
   })
+
+  const updateMeMutate = useUpdateMe()
+
+  const uploadImageMutate = useUploadImageMutation()
 
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
@@ -35,7 +46,6 @@ export default function UpdateProfileForm() {
   })
 
   const avatar = form.watch('avatar')
-  const name = form.watch('name')
 
   const previewAvatar = useMemo(() => {
     if (file) {
@@ -49,17 +59,44 @@ export default function UpdateProfileForm() {
       form.reset({ name: getMeResponse.payload.data.name, avatar: getMeResponse.payload.data.avatar ?? '' })
   }, [form, getMeResponse?.payload.data.avatar, getMeResponse?.payload.data.name, isSuccessGetMe])
 
-  function onChangeAvatarInput(ev: React.ChangeEvent<HTMLInputElement>) {
-    const file = ev.target.files?.[0]
+  function onReset() {
+    setFile(null)
+    form.reset()
+  }
 
-    if (file) {
-      setFile(file)
+  async function onValid(values: UpdateMeBodyType) {
+    if (uploadImageMutate.isPending || updateMeMutate.isPending) return
+
+    try {
+      let body = { ...values }
+
+      if (file) {
+        const formData = new FormData()
+        formData.append('avatar', file)
+
+        const uploadImageResponse = await uploadImageMutate.mutateAsync(formData)
+        const imageUrl = uploadImageResponse.payload.data
+
+        body = { ...body, avatar: imageUrl }
+      }
+
+      const response = await updateMeMutate.mutateAsync(body)
+
+      refreshGetMe()
+      toast.success(response.payload.message)
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
     }
   }
 
   return (
     <Form {...form}>
-      <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8">
+      <form
+        noValidate
+        className="grid auto-rows-max items-start gap-4 md:gap-8"
+        onReset={onReset}
+        onSubmit={form.handleSubmit(onValid)}
+      >
         <Card x-chunk="dashboard-07-chunk-0">
           <CardHeader>
             <CardTitle>Thông tin cá nhân</CardTitle>
@@ -69,31 +106,43 @@ export default function UpdateProfileForm() {
               <FormField
                 control={form.control}
                 name="avatar"
-                render={({ field: _field }) => (
-                  <FormItem>
-                    <div className="flex items-start justify-start gap-2">
-                      <Avatar className="aspect-square size-[100px] rounded-md object-cover">
-                        <AvatarImage src={previewAvatar} />
-                        <AvatarFallback className="rounded-none">{name}</AvatarFallback>
-                      </Avatar>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={avatarInputRef}
-                        onChange={onChangeAvatarInput}
-                      />
-                      <button
-                        className="flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed"
-                        type="button"
-                        onClick={() => avatarInputRef.current?.click()}
-                      >
-                        <Upload className="size-4 text-muted-foreground" />
-                        <span className="sr-only">Upload</span>
-                      </button>
-                    </div>
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  function onChangeAvatarInput(ev: React.ChangeEvent<HTMLInputElement>) {
+                    const file = ev.target.files?.[0]
+
+                    if (file) {
+                      setFile(file)
+                      // field.onChange('data:image/png;base64,' + btoa(URL.createObjectURL(file)))
+                      // field.onChange(URL.createObjectURL(file))
+                      field.onChange('http:localhost:3000/' + field.name)
+                    }
+                  }
+                  return (
+                    <FormItem>
+                      <div className="flex items-start justify-start gap-2">
+                        <Avatar className="aspect-square size-[100px] rounded-md object-cover">
+                          <AvatarImage src={previewAvatar} />
+                          <AvatarFallback className="rounded-none">{getMeResponse?.payload.data.name}</AvatarFallback>
+                        </Avatar>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          ref={avatarInputRef}
+                          onChange={onChangeAvatarInput}
+                        />
+                        <button
+                          className="flex aspect-square w-[100px] items-center justify-center rounded-md border border-dashed"
+                          type="button"
+                          onClick={() => avatarInputRef.current?.click()}
+                        >
+                          <Upload className="size-4 text-muted-foreground" />
+                          <span className="sr-only">Upload</span>
+                        </button>
+                      </div>
+                    </FormItem>
+                  )
+                }}
               />
 
               <FormField
@@ -111,11 +160,24 @@ export default function UpdateProfileForm() {
               />
 
               <div className=" flex items-center gap-2 md:ml-auto">
-                <Button variant="outline" size="sm" type="reset">
-                  Hủy
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="reset"
+                  disabled={uploadImageMutate.isPending || updateMeMutate.isPending}
+                >
+                  Reset
                 </Button>
-                <Button size="sm" type="submit">
-                  Lưu thông tin
+                <Button
+                  size="sm"
+                  type="submit"
+                  className="gap-1"
+                  disabled={uploadImageMutate.isPending || updateMeMutate.isPending}
+                >
+                  {uploadImageMutate.isPending || updateMeMutate.isPending ? (
+                    <LoaderCircleIcon className="size-4 animate-spin" />
+                  ) : null}
+                  Cập nhật
                 </Button>
               </div>
             </div>
