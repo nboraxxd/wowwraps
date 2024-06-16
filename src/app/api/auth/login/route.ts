@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const cookieStore = cookies()
 
   try {
-    const { payload } = await authApi.bLogin(body)
+    const { payload } = await authApi.loginFromBrowserToBackend(body)
 
     const {
       data: { accessToken, refreshToken },

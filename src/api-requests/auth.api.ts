@@ -5,10 +5,10 @@ import { LoginBodyType, LoginResType, LogoutBodyType } from '@/lib/schemaValidat
 
 const authApi = {
   // API OF BACKEND SERVER
-  bLogin: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
+  loginFromBrowserToBackend: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
 
   // bLogout sẽ được gọi từ Next.js server nên cần tự thêm accessToken vào headers.Authorization
-  bLogout: ({ accessToken, refreshToken }: LogoutBodyType & { accessToken: string }) =>
+  logoutFromServerToBackend: ({ accessToken, refreshToken }: LogoutBodyType & { accessToken: string }) =>
     http.post<MessageResType>(
       '/auth/logout',
       { refreshToken },
@@ -16,12 +16,13 @@ const authApi = {
     ),
 
   // API OF NEXT.JS SERVER
-  nLogin: (body: LoginBodyType) =>
+  loginFromBrowserToServer: (body: LoginBodyType) =>
     http.post<LoginResType>('/api/auth/login', body, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
 
   // nLogout sẽ được gọi từ Next.js client nên không cần truyền accessToken và refreshToken
   // vì nó sẽ tự động gởi thông qua cookie
-  nLogout: () => http.post<MessageResType>('/api/auth/logout', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
+  logoutFromBrowserToServer: () =>
+    http.post<MessageResType>('/api/auth/logout', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
 }
 
 export default authApi

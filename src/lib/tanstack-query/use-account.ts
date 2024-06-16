@@ -12,7 +12,7 @@ type GetMeQueryOptions = {
 export function useGetMe({ onSuccess, enabled = true }: GetMeQueryOptions) {
   return useQuery({
     queryFn: () =>
-      accountApi.bGetMe().then((res) => {
+      accountApi.getMeFromBrowserToBackend().then((res) => {
         onSuccess && onSuccess(res.payload)
         return res
       }),
@@ -23,14 +23,14 @@ export function useGetMe({ onSuccess, enabled = true }: GetMeQueryOptions) {
 
 export function useUpdateMe() {
   return useMutation({
-    mutationFn: accountApi.bUpadateMe,
+    mutationFn: accountApi.upadateMeFromBrowserToBackend,
     mutationKey: [QueryKey.bUpdateMe],
   })
 }
 
 export function useChangePassword() {
   return useMutation({
-    mutationFn: accountApi.bChangePassword,
+    mutationFn: accountApi.changePasswordFromBrowserToBackend,
     mutationKey: [QueryKey.bChangePassword],
   })
 }

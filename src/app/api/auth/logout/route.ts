@@ -18,7 +18,7 @@ export async function POST() {
   }
 
   try {
-    const { payload } = await authApi.bLogout({ accessToken, refreshToken })
+    const { payload } = await authApi.logoutFromServerToBackend({ accessToken, refreshToken })
 
     return Response.json(payload)
   } catch (error) {
