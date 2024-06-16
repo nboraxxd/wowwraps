@@ -1,8 +1,13 @@
 'use client'
 
+import { toast } from 'sonner'
+import { LoaderCircleIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { handleErrorApi } from '@/utils/error'
+import { useAuthStore } from '@/lib/stores/auth-store'
+import { useChangePassword, useGetMe } from '@/lib/tanstack-query/use-account'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +16,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ChangePasswordForm() {
+  const isAuth = useAuthStore((state) => state.isAuth)
+
+  const { data: getMeResponse } = useGetMe({
+    enabled: isAuth,
+  })
+
+  const changePasswordMutate = useChangePassword()
+
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -20,9 +33,22 @@ export default function ChangePasswordForm() {
     },
   })
 
+  async function onValid(values: ChangePasswordBodyType) {
+    if (changePasswordMutate.isPending) return
+
+    try {
+      const response = await changePasswordMutate.mutateAsync(values)
+
+      form.reset()
+      toast.success(response.payload.message)
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
+
   return (
     <Form {...form}>
-      <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8">
+      <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" onSubmit={form.handleSubmit(onValid)}>
         <Card className="overflow-hidden" x-chunk="dashboard-07-chunk-4">
           <CardHeader>
             <CardTitle>Đổi mật khẩu</CardTitle>
@@ -31,10 +57,17 @@ export default function ChangePasswordForm() {
           <CardContent>
             <div className="grid gap-6">
               {/* Email */}
+
               <div className="hidden">
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" autoComplete="name" readOnly />
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    disabled
+                    readOnly
+                    defaultValue={getMeResponse?.payload.data.email}
+                  />
                 </FormControl>
               </div>
 
@@ -91,10 +124,10 @@ export default function ChangePasswordForm() {
                 )}
               />
               <div className=" flex items-center gap-2 md:ml-auto">
-                <Button variant="outline" size="sm">
-                  Hủy
+                <Button size="sm" type="submit" className="gap-1" disabled={changePasswordMutate.isPending}>
+                  {changePasswordMutate.isPending ? <LoaderCircleIcon className="size-4 animate-spin" /> : null}
+                  Đổi mật khẩu
                 </Button>
-                <Button size="sm">Lưu thông tin</Button>
               </div>
             </div>
           </CardContent>

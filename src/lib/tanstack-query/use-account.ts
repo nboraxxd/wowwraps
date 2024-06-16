@@ -27,3 +27,10 @@ export function useUpdateMe() {
     mutationKey: [QueryKey.bUpdateMe],
   })
 }
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: accountApi.bChangePassword,
+    mutationKey: [QueryKey.bChangePassword],
+  })
+}
