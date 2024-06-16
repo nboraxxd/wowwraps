@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useGetMe } from '@/lib/tanstack-query/use-account'
-import { useNLogoutMutation } from '@/lib/tanstack-query/use-auth'
+import { useGetMeQuery } from '@/lib/tanstack-query/use-account'
+import { useNLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,9 +31,9 @@ export default function DropdownAvatar() {
     data: getMeResponse,
     isLoading: isLoadingGetMe,
     isSuccess: isSuccessGetMe,
-  } = useGetMe({ enabled: isAuth, onSuccess: (data) => setMe(data.data) })
+  } = useGetMeQuery({ enabled: isAuth, onSuccess: (data) => setMe(data.data) })
 
-  const nLogoutMutation = useNLogoutMutation()
+  const nLogoutMutation = useNLogoutToServerMutation()
 
   async function handleLogout() {
     if (nLogoutMutation.isPending) return

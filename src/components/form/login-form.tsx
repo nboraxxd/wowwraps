@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useNLoginMutation } from '@/lib/tanstack-query/use-auth'
+import { useLoginToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { LoginBody, LoginBodyType } from '@/lib/schemaValidations/auth.schema'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -28,7 +28,7 @@ export default function LoginForm() {
     },
   })
 
-  const nLoginMutation = useNLoginMutation()
+  const nLoginMutation = useLoginToServerMutation()
 
   function onValid(values: LoginBodyType) {
     if (nLoginMutation.isPending) return

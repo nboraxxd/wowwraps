@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
 import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
-import { useGetMe, useUpdateMe } from '@/lib/tanstack-query/use-account'
+import { useGetMeQuery, useUpdateMeQuery } from '@/lib/tanstack-query/use-account'
 import { UpdateMeBody, UpdateMeBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,11 +29,11 @@ export default function UpdateProfileForm() {
     data: getMeResponse,
     isSuccess: isSuccessGetMe,
     refetch: refreshGetMe,
-  } = useGetMe({
+  } = useGetMeQuery({
     enabled: isAuth,
   })
 
-  const updateMeMutate = useUpdateMe()
+  const updateMeMutate = useUpdateMeQuery()
 
   const uploadImageMutate = useUploadImageMutation()
 

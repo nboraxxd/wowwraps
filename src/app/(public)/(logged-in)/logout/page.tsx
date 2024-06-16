@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { getRefreshTokenFromLocalStorage } from '@/utils/local-storage'
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useNLogoutMutation } from '@/lib/tanstack-query/use-auth'
+import { useNLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -33,7 +33,7 @@ export default function LogoutPage() {
   const setMe = useAuthStore((state) => state.setMe)
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
 
-  const { mutateAsync: nLogoutMutateAsync } = useNLogoutMutation()
+  const { mutateAsync: nLogoutMutateAsync } = useNLogoutToServerMutation()
 
   useEffect(() => {
     if (logOutRef.current !== null || refreshTokenFromUrl !== getRefreshTokenFromLocalStorage()) return

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useChangePassword, useGetMe } from '@/lib/tanstack-query/use-account'
+import { useChangePasswordQuery, useGetMeQuery } from '@/lib/tanstack-query/use-account'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,11 +18,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 export default function ChangePasswordForm() {
   const isAuth = useAuthStore((state) => state.isAuth)
 
-  const { data: getMeResponse } = useGetMe({
+  const { data: getMeResponse } = useGetMeQuery({
     enabled: isAuth,
   })
 
-  const changePasswordMutate = useChangePassword()
+  const changePasswordMutate = useChangePasswordQuery()
 
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
