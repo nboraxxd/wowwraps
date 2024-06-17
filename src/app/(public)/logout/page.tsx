@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useNLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
+import { useLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { handleErrorApi } from '@/utils/error'
 import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from '@/utils/local-storage'
 
@@ -22,7 +22,7 @@ export default function LogoutPage() {
   const setMe = useAuthStore((state) => state.setMe)
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
 
-  const { mutateAsync: nLogoutMutateAsync } = useNLogoutToServerMutation()
+  const { mutateAsync: nLogoutMutateAsync } = useLogoutToServerMutation()
 
   useEffect(() => {
     if (

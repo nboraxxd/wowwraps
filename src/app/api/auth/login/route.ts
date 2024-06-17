@@ -1,10 +1,10 @@
-import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
+import { cookies } from 'next/headers'
 
 import authApi from '@/api-requests/auth.api'
-import { LoginBodyType } from '@/lib/schemaValidations/auth.schema'
 import { TokenPayload } from '@/types/jwt.types'
 import { HttpError } from '@/utils/http'
+import { LoginBodyType } from '@/lib/schemaValidations/auth.schema'
 
 export async function POST(request: Request) {
   const body = (await request.json()) as LoginBodyType
