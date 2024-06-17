@@ -20,15 +20,15 @@ export async function POST() {
       data: { accessToken: newAccessToken, refreshToken: newRefreshToken },
     } = payload
 
-    const accessTokenDecoded = jwt.decode(newAccessToken) as TokenPayload
-    const refreshTokenDecoded = jwt.decode(newRefreshToken) as TokenPayload
+    const newAccessTokenDecoded = jwt.decode(newAccessToken) as TokenPayload
+    const newRefreshTokenDecoded = jwt.decode(newRefreshToken) as TokenPayload
 
     cookieStore.set('accessToken', newAccessToken, {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',
       secure: true,
-      expires: accessTokenDecoded.exp * 1000,
+      expires: newAccessTokenDecoded.exp * 1000,
     })
 
     cookieStore.set('refreshToken', newRefreshToken, {
@@ -36,11 +36,12 @@ export async function POST() {
       httpOnly: true,
       sameSite: 'lax',
       secure: true,
-      expires: refreshTokenDecoded.exp * 1000,
+      expires: newRefreshTokenDecoded.exp * 1000,
     })
 
     return Response.json(payload)
   } catch (error: any) {
+    console.log('🥴 ~ POST ~ error:', error)
     return Response.json({ message: error.message || 'Something went wrong' }, { status: 401 })
   }
 }

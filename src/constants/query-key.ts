@@ -1,7 +1,8 @@
 export const QueryKey = {
   // Auth API
-  nLogin: 'bLogin',
-  nLogout: 'bLogout',
+  nLogin: 'nLogin',
+  nLogout: 'nLogout',
+  nRefreshToken: 'nRefreshToken',
 
   // Account API
   bGetMe: 'bGetMe',

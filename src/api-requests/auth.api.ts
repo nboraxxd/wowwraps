@@ -10,6 +10,8 @@ import {
 } from '@/lib/schemaValidations/auth.schema'
 
 const authApi = {
+  refreshTokenFromBrowserToServerRequest: null as Promise<{ status: number; payload: RefreshTokenResType }> | null,
+
   // API OF BACKEND SERVER
   loginFromBrowserToBackend: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
 
@@ -36,8 +38,20 @@ const authApi = {
   logoutFromBrowserToServer: () =>
     http.post<MessageResType>('/api/auth/logout', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
 
-  refreshTokenFromBrowserToServer: () =>
-    http.post<RefreshTokenResType>('/api/auth/refresh-token', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
+  async refreshTokenFromBrowserToServer() {
+    if (this.refreshTokenFromBrowserToServerRequest) return this.refreshTokenFromBrowserToServerRequest
+
+    this.refreshTokenFromBrowserToServerRequest = http.post<RefreshTokenResType>(
+      '/api/auth/refresh-token',
+      {},
+      { baseUrl: envConfig.NEXT_PUBLIC_URL }
+    )
+
+    const response = await this.refreshTokenFromBrowserToServerRequest
+
+    this.refreshTokenFromBrowserToServerRequest = null
+    return response
+  },
 }
 
 export default authApi

@@ -3,6 +3,7 @@ import { Inter as FontSans } from 'next/font/google'
 
 import { cn } from '@/utils'
 import { Toaster } from '@/components/ui/sonner'
+import { RefreshToken } from '@/components/common'
 import { TanstackQueryProvider, ThemeProvider, AuthProvider } from '@/components/provider'
 import './globals.css'
 
@@ -26,7 +27,10 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
         <TanstackQueryProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <RefreshToken />
+            </AuthProvider>
             <Toaster />
           </ThemeProvider>
         </TanstackQueryProvider>

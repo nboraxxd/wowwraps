@@ -25,6 +25,8 @@ export default function LogoutPage() {
   const { mutateAsync: nLogoutMutateAsync } = useLogoutToServerMutation()
 
   useEffect(() => {
+    let timeout: NodeJS.Timeout | null = null
+
     if (
       !logOutRef.current &&
       ((accessTokenFromUrl && accessTokenFromUrl === getAccessTokenFromLocalStorage()) ||
@@ -41,7 +43,7 @@ export default function LogoutPage() {
           router.push('/')
           router.refresh()
 
-          setTimeout(() => {
+          timeout = setTimeout(() => {
             logOutRef.current = null
           }, 1000)
         } catch (error) {
@@ -50,6 +52,10 @@ export default function LogoutPage() {
       })()
     } else {
       router.push('/')
+    }
+
+    return () => {
+      if (timeout) clearTimeout(timeout)
     }
   }, [accessTokenFromUrl, nLogoutMutateAsync, refreshTokenFromUrl, router, setIsAuth, setMe])
 
