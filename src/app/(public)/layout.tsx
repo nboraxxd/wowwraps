@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
 
-import NavItems from '@/app/(public)/nav-items'
+import { NavItems } from '@/app/(public)/_components'
 import { LogoIcon } from '@/components/icons'
 import { DarkModeToggle, DropdownAvatar } from '@/components/common'
 import { Button } from '@/components/ui/button'

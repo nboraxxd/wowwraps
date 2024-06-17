@@ -30,8 +30,6 @@ const AUTHENTICATION_ERROR_STATUS = 401
 
 let clientLogoutRequest: Promise<any> | null = null
 
-let accessToken: string | null = getAccessTokenFromLocalStorage()
-
 export class HttpError extends Error {
   status: number
   payload: {
@@ -65,8 +63,11 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
 
   const fullUrl = `${baseUrl}${addFirstSlashToUrl(url)}`
 
-  if (isBrowser && accessToken) {
-    baseHeaders.Authorization = `Bearer ${accessToken}`
+  if (isBrowser) {
+    const accessToken = getAccessTokenFromLocalStorage()
+    if (accessToken) {
+      baseHeaders.Authorization = `Bearer ${accessToken}`
+    }
   }
 
   const res = await fetch(fullUrl, {
@@ -106,7 +107,6 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
         } finally {
           removeTokensFromLocalStorage()
           clientLogoutRequest = null
-
           // Redirect về trang login có thể dẫn đến loop vô hạn
           // Nếu không không được xử lý đúng cách
           // Vì nếu rơi vào trường hợp tại trang Login, chúng ta có gọi các API cần access token
@@ -116,10 +116,13 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
       }
 
       if (!isBrowser) {
+        // Đây là trường hợp khi mà access token của chúng ta còn hạn
+        // Và chúng ta gọi API ở Next.js server (route handler hoặc server component) đến server backend
         const accessToken = options?.headers?.Authorization?.split('Bearer ')[1]
 
         redirect(`/logout?accessToken=${accessToken}`)
       }
+      throw new HttpError(data)
     } else {
       throw new HttpError(data)
     }
@@ -127,16 +130,14 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
 
   // Client gọi đến Next.js API route để login
   if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/login') {
-    const { accessToken: responseAccessToken, refreshToken: responseRefreshToken } = (payload as LoginResType).data
+    const { accessToken, refreshToken } = (payload as LoginResType).data
 
-    setAccessTokenToLocalStorage(responseAccessToken)
-    setRefreshTokenToLocalStorage(responseRefreshToken)
-    accessToken = responseAccessToken
+    setAccessTokenToLocalStorage(accessToken)
+    setRefreshTokenToLocalStorage(refreshToken)
 
     // Client gọi đến Next.js API route để logout
   } else if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/logout') {
     removeTokensFromLocalStorage()
-    accessToken = null
   }
 
   return data
