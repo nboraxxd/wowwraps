@@ -39,8 +39,10 @@ export async function checkAndRefreshToken(params?: { onSuccess?: () => void; on
   // Còn khi dùng cú pháp `new Date().getTime()` thì nó sẽ trả về epoch time (ms)
   const now = Math.floor(new Date().getTime() / 1000)
 
-  // Trường hợp refresh token hết hạn thì không xử lý nữa
-  if (refreshTokenDecoded.exp <= now) {
+  const shouldRefreshToken = accessTokenDecoded.exp - now < (accessTokenDecoded.exp - accessTokenDecoded.iat) / 3
+
+  // Trường hợp BẮT BUỘC PHẢI refresh token nhưng khi đó refresh token đã hết hạn thì không xử lý nữa
+  if (shouldRefreshToken && refreshTokenDecoded.exp <= now) {
     removeTokensFromLocalStorage()
     return params?.onError && params.onError()
   }
@@ -52,7 +54,7 @@ export async function checkAndRefreshToken(params?: { onSuccess?: () => void; on
 
   // Thời gian còn lại của access token nhỏ hơn 1/3 thời gian hết hạn của access token
   // thì tiến hành refresh token
-  if (accessTokenDecoded.exp - now < (accessTokenDecoded.exp - accessTokenDecoded.iat) / 3) {
+  if (shouldRefreshToken) {
     try {
       const response = await authApi.refreshTokenFromBrowserToServer()
       const { accessToken, refreshToken } = response.payload.data

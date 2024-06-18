@@ -21,7 +21,6 @@ export default function RefreshToken() {
     if (UNAUTHENTICATED_PATHS.includes(pathname)) return
 
     let interval: NodeJS.Timeout | null = null
-    let timeout: NodeJS.Timeout | null = null
 
     const onError = () => {
       if (interval) {
@@ -34,11 +33,9 @@ export default function RefreshToken() {
       const next = new URLSearchParams()
       next.set('next', pathname)
 
-      timeout = setTimeout(() => {
-        router.push(`/login/?${next}`)
-        router.refresh()
-        toast.warning('Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại.')
-      }, 300)
+      router.push(`/login/?${next}`)
+      router.refresh()
+      toast.warning('Phiên đăng nhập của bạn đã hết hạn, vui lòng đăng nhập lại.')
     }
 
     // Phải gọi 1 lần đầu tiên vì interval sẽ chỉ chạy sau thời gian TIMEOUT
@@ -66,7 +63,6 @@ export default function RefreshToken() {
 
     return () => {
       if (interval) clearInterval(interval)
-      if (timeout) clearTimeout(timeout)
     }
   }, [pathname, router, setIsAuth, setMe])
 
