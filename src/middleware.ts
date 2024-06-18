@@ -11,9 +11,12 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('accessToken')?.value
   const refreshToken = request.cookies.get('refreshToken')?.value
 
-  // Redirect to login page if doesn't have refresh token
-  if (authorizedPaths.some((item) => pathname.startsWith(item)) && !refreshToken) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Redirect to login page if doesn't have refresh token and access token
+  if (authorizedPaths.some((item) => pathname.startsWith(item)) && !refreshToken && !accessToken) {
+    const url = new URL('/login', request.url)
+    url.searchParams.set('next', pathname)
+
+    return NextResponse.redirect(url)
   }
 
   // Redirect to home page if has refresh token

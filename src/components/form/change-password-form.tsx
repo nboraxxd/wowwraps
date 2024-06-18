@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
-import { useChangePasswordQuery, useGetMeQuery } from '@/lib/tanstack-query/use-account'
+import { useChangePasswordMutation, useGetMeQuery } from '@/lib/tanstack-query/use-account'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,7 +22,7 @@ export default function ChangePasswordForm() {
     enabled: isAuth,
   })
 
-  const changePasswordMutate = useChangePasswordQuery()
+  const changePasswordMutation = useChangePasswordMutation()
 
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
@@ -34,10 +34,10 @@ export default function ChangePasswordForm() {
   })
 
   async function onValid(values: ChangePasswordBodyType) {
-    if (changePasswordMutate.isPending) return
+    if (changePasswordMutation.isPending) return
 
     try {
-      const response = await changePasswordMutate.mutateAsync(values)
+      const response = await changePasswordMutation.mutateAsync(values)
 
       form.reset()
       toast.success(response.payload.message)
@@ -124,8 +124,8 @@ export default function ChangePasswordForm() {
                 )}
               />
               <div className=" flex items-center gap-2 md:ml-auto">
-                <Button size="sm" type="submit" className="gap-1" disabled={changePasswordMutate.isPending}>
-                  {changePasswordMutate.isPending ? <LoaderCircleIcon className="size-4 animate-spin" /> : null}
+                <Button size="sm" type="submit" className="gap-1" disabled={changePasswordMutation.isPending}>
+                  {changePasswordMutation.isPending ? <LoaderCircleIcon className="size-4 animate-spin" /> : null}
                   Đổi mật khẩu
                 </Button>
               </div>

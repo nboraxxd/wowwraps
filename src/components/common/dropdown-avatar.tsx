@@ -33,18 +33,19 @@ export default function DropdownAvatar() {
     isSuccess: isSuccessGetMe,
   } = useGetMeQuery({ enabled: isAuth, onSuccess: (data) => setMe(data.data) })
 
-  const nLogoutMutation = useLogoutToServerMutation()
+  const logoutToServerMutation = useLogoutToServerMutation()
 
   async function handleLogout() {
-    if (nLogoutMutation.isPending) return
+    if (logoutToServerMutation.isPending) return
 
     try {
-      const response = await nLogoutMutation.mutateAsync()
+      const response = await logoutToServerMutation.mutateAsync()
 
       setIsAuth(false)
       setMe(null)
       toast(response.payload.message)
 
+      router.push('/')
       router.refresh()
     } catch (error) {
       handleErrorApi({ error })

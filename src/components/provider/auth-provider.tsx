@@ -17,9 +17,12 @@ export default function AuthProvider({ children }: Props) {
   useEffect(() => {
     const isAuth = () => {
       const accessToken = getAccessTokenFromLocalStorage()
+
       const accessTokenDecoded = accessToken ? (jwt.decode(accessToken) as TokenPayload) : null
 
-      return accessTokenDecoded ? accessTokenDecoded.exp > Math.floor(new Date().getTime() / 1000) : false
+      const now = Math.floor(new Date().getTime() / 1000)
+
+      return accessTokenDecoded ? accessTokenDecoded.exp > now : false
     }
 
     setIsAuth(isAuth())

@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
 import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
-import { useGetMeQuery, useUpdateMeQuery } from '@/lib/tanstack-query/use-account'
+import { useGetMeQuery, useUpdateMeMutation } from '@/lib/tanstack-query/use-account'
 import { UpdateMeBody, UpdateMeBodyType } from '@/lib/schemaValidations/account.schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,9 +33,9 @@ export default function UpdateProfileForm() {
     enabled: isAuth,
   })
 
-  const updateMeMutate = useUpdateMeQuery()
+  const updateMeMutation = useUpdateMeMutation()
 
-  const uploadImageMutate = useUploadImageMutation()
+  const uploadImageMutation = useUploadImageMutation()
 
   const form = useForm<UpdateMeBodyType>({
     resolver: zodResolver(UpdateMeBody),
@@ -65,7 +65,7 @@ export default function UpdateProfileForm() {
   }
 
   async function onValid(values: UpdateMeBodyType) {
-    if (uploadImageMutate.isPending || updateMeMutate.isPending) return
+    if (uploadImageMutation.isPending || updateMeMutation.isPending) return
 
     try {
       let body = { ...values }
@@ -74,13 +74,13 @@ export default function UpdateProfileForm() {
         const formData = new FormData()
         formData.append('avatar', file)
 
-        const uploadImageResponse = await uploadImageMutate.mutateAsync(formData)
+        const uploadImageResponse = await uploadImageMutation.mutateAsync(formData)
         const imageUrl = uploadImageResponse.payload.data
 
         body = { ...body, avatar: imageUrl }
       }
 
-      const response = await updateMeMutate.mutateAsync(body)
+      const response = await updateMeMutation.mutateAsync(body)
 
       refreshGetMe()
       toast.success(response.payload.message)
@@ -164,7 +164,7 @@ export default function UpdateProfileForm() {
                   variant="outline"
                   size="sm"
                   type="reset"
-                  disabled={uploadImageMutate.isPending || updateMeMutate.isPending}
+                  disabled={uploadImageMutation.isPending || updateMeMutation.isPending}
                 >
                   Reset
                 </Button>
@@ -172,9 +172,9 @@ export default function UpdateProfileForm() {
                   size="sm"
                   type="submit"
                   className="gap-1"
-                  disabled={uploadImageMutate.isPending || updateMeMutate.isPending}
+                  disabled={uploadImageMutation.isPending || updateMeMutation.isPending}
                 >
-                  {uploadImageMutate.isPending || updateMeMutate.isPending ? (
+                  {uploadImageMutation.isPending || updateMeMutation.isPending ? (
                     <LoaderCircleIcon className="size-4 animate-spin" />
                   ) : null}
                   Cập nhật

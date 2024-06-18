@@ -49,7 +49,8 @@ export default function RefreshToken() {
 
     // Timeout interval phải nhỏ hơn thời gian hết hạn của access token
     // Ví dụ access token hết hạn sau 30s thì 10s chúng ta sẽ check refresh token 1 lần
-    const TIMEOUT = 10000
+    // TIMEOUT phải nhỏ hơn 1/3 thời gian hết hạn của access token
+    const TIMEOUT = 8000
     interval = setInterval(
       () =>
         checkAndRefreshToken({

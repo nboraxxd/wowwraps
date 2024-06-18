@@ -21,14 +21,14 @@ export function useGetMeQuery({ onSuccess, enabled = true }: GetMeQueryOptions) 
   })
 }
 
-export function useUpdateMeQuery() {
+export function useUpdateMeMutation() {
   return useMutation({
     mutationFn: accountApi.upadateMeFromBrowserToBackend,
     mutationKey: [QueryKey.bUpdateMe],
   })
 }
 
-export function useChangePasswordQuery() {
+export function useChangePasswordMutation() {
   return useMutation({
     mutationFn: accountApi.changePasswordFromBrowserToBackend,
     mutationKey: [QueryKey.bChangePassword],

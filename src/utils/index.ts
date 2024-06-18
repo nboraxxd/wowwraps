@@ -41,7 +41,7 @@ export async function checkAndRefreshToken(params?: { onSuccess?: () => void; on
 
   const shouldRefreshToken = accessTokenDecoded.exp - now < (accessTokenDecoded.exp - accessTokenDecoded.iat) / 3
 
-  // Trường hợp BẮT BUỘC PHẢI refresh token nhưng khi đó refresh token đã hết hạn thì không xử lý nữa
+  // Trường hợp BẮT BUỘC PHẢI refresh token nhưng khi đó refreshToken đã hết hạn thì không xử lý nữa
   if (shouldRefreshToken && refreshTokenDecoded.exp <= now) {
     removeTokensFromLocalStorage()
     return params?.onError && params.onError()

@@ -1,10 +1,16 @@
 'use client'
 
+import { useEffect } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { handleErrorApi } from '@/utils/error'
+import {
+  getAccessTokenFromLocalStorage,
+  getRefreshTokenFromLocalStorage,
+  removeTokensFromLocalStorage,
+} from '@/utils/local-storage'
 import { useAuthStore } from '@/lib/stores/auth-store'
 import { useLoginToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { LoginBody, LoginBodyType } from '@/lib/schemaValidations/auth.schema'
@@ -16,6 +22,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function LoginForm() {
   const router = useRouter()
+  const pathname = usePathname()
+
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next')
 
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
   const setMe = useAuthStore((state) => state.setMe)
@@ -28,22 +38,34 @@ export default function LoginForm() {
     },
   })
 
-  const nLoginMutation = useLoginToServerMutation()
+  const loginToServerMutation = useLoginToServerMutation()
 
-  function onValid(values: LoginBodyType) {
-    if (nLoginMutation.isPending) return
+  useEffect(() => {
+    const accessToken = getAccessTokenFromLocalStorage()
+    const refreshToken = getRefreshTokenFromLocalStorage()
 
-    nLoginMutation.mutate(values, {
-      onSuccess: (response) => {
-        setIsAuth(true)
-        setMe(response.payload.data.account)
-        router.push('/')
-        router.refresh()
-      },
-      onError: (error) => {
-        handleErrorApi({ error, setError: form.setError })
-      },
-    })
+    if (next && (accessToken || refreshToken)) {
+      removeTokensFromLocalStorage()
+    }
+  }, [next])
+
+  async function onValid(values: LoginBodyType) {
+    if (loginToServerMutation.isPending) return
+
+    try {
+      const response = await loginToServerMutation.mutateAsync(values)
+
+      setIsAuth(true)
+      setMe(response.payload.data.account)
+
+      const from = new URLSearchParams()
+      from.set('from', pathname)
+
+      router.push(next ? `${next}/?${from}` : '/')
+      router.refresh()
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
   }
 
   return (
