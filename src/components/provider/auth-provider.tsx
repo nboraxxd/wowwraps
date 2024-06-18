@@ -1,7 +1,9 @@
 'use client'
 
+import jwt from 'jsonwebtoken'
 import { useEffect } from 'react'
 
+import { TokenPayload } from '@/types/jwt.types'
 import { useAuthStore } from '@/lib/stores/auth-store'
 import { getAccessTokenFromLocalStorage } from '@/utils/local-storage'
 
@@ -13,7 +15,14 @@ export default function AuthProvider({ children }: Props) {
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
 
   useEffect(() => {
-    setIsAuth(Boolean(getAccessTokenFromLocalStorage()))
+    const isAuth = () => {
+      const accessToken = getAccessTokenFromLocalStorage()
+      const accessTokenDecoded = accessToken ? (jwt.decode(accessToken) as TokenPayload) : null
+
+      return accessTokenDecoded ? accessTokenDecoded.exp > Math.floor(new Date().getTime() / 1000) : false
+    }
+
+    setIsAuth(isAuth())
   }, [setIsAuth])
 
   return children

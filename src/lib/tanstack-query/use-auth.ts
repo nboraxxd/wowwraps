@@ -12,8 +12,3 @@ export function useLoginToServerMutation() {
 export function useLogoutToServerMutation() {
   return useMutation({ mutationFn: authApi.logoutFromBrowserToServer, mutationKey: [QueryKey.nLogout] })
 }
-
-// Calling the refresh token API from the browser to the Next.js server (using Next.js server as a proxy)
-export function useRefreshTokenToServerMutation() {
-  return useMutation({ mutationFn: authApi.refreshTokenFromBrowserToServer, mutationKey: [QueryKey.nRefreshToken] })
-}

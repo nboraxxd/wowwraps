@@ -41,7 +41,6 @@ export async function POST() {
 
     return Response.json(payload)
   } catch (error: any) {
-    console.log('🥴 ~ POST ~ error:', error)
     return Response.json({ message: error.message || 'Something went wrong' }, { status: 401 })
   }
 }

@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers'
+import Link from 'next/link'
 
 import accountApi from '@/api-requests/account.api'
+import { Button } from '@/components/ui/button'
 
 export default async function DashboardPage() {
   const cookieStore = cookies()
@@ -17,5 +19,17 @@ export default async function DashboardPage() {
     }
   }
 
-  return <div>DashBoardPage {name}</div>
+  return (
+    <div>
+      <p>DashBoardPage {name}</p>
+      <div className="space-x-2">
+        <Button asChild>
+          <Link href="/login">Login</Link>
+        </Button>
+        <Button asChild>
+          <Link href="/manage/setting">Setting</Link>
+        </Button>
+      </div>
+    </div>
+  )
 }
