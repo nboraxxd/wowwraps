@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { checkAndRefreshToken } from '@/utils'
 import { getRefreshTokenFromLocalStorage } from '@/utils/local-storage'
 import { useAuthStore } from '@/lib/stores/auth-store'
 
-export default function RefreshTokenPage() {
+function RefreshTokenPageWithoutSuspense() {
   const setIsAuth = useAuthStore((state) => state.setIsAuth)
 
   const router = useRouter()
@@ -36,4 +36,12 @@ export default function RefreshTokenPage() {
   }, [nextPath, pathname, refreshTokenFromUrl, router, setIsAuth])
 
   return null
+}
+
+export default function RefreshTokenPage() {
+  return (
+    <Suspense>
+      <RefreshTokenPageWithoutSuspense />
+    </Suspense>
+  )
 }

@@ -120,7 +120,7 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
         // Và chúng ta gọi API ở Next.js server (route handler hoặc server component) đến server backend
         const accessToken = options?.headers?.Authorization?.split('Bearer ')[1]
 
-        redirect(`/logout?accessToken=${accessToken}`)
+        redirect(`/logout?access-token=${accessToken}`)
       }
       throw new HttpError(data)
     } else {

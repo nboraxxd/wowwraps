@@ -1,2 +1,5 @@
 export { default as NavLinks } from './nav-links'
 export { default as MobileNavLinks } from './mobile-nav-links'
+export { default as AccountTable } from './account-table'
+export { default as AddEmployee } from './add-employee'
+export { default as EditEmployee } from './edit-employee'

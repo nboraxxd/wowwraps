@@ -41,7 +41,7 @@ export default function UpdateProfileForm() {
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name: '',
-      avatar: '',
+      avatar: undefined,
     },
   })
 
@@ -56,7 +56,7 @@ export default function UpdateProfileForm() {
 
   useEffect(() => {
     isSuccessGetMe &&
-      form.reset({ name: getMeResponse.payload.data.name, avatar: getMeResponse.payload.data.avatar ?? '' })
+      form.reset({ name: getMeResponse.payload.data.name, avatar: getMeResponse.payload.data.avatar ?? undefined })
   }, [form, getMeResponse?.payload.data.avatar, getMeResponse?.payload.data.name, isSuccessGetMe])
 
   function onReset() {
@@ -122,7 +122,9 @@ export default function UpdateProfileForm() {
                       <div className="flex items-start justify-start gap-2">
                         <Avatar className="aspect-square size-[100px] rounded-md object-cover">
                           <AvatarImage src={previewAvatar} />
-                          <AvatarFallback className="rounded-none">{getMeResponse?.payload.data.name}</AvatarFallback>
+                          <AvatarFallback className="rounded-none text-center">
+                            {getMeResponse?.payload.data.name}
+                          </AvatarFallback>
                         </Avatar>
                         <input
                           type="file"

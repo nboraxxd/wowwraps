@@ -1,7 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
-import { useEffect, useRef } from 'react'
+import { Suspense, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { useAuthStore } from '@/lib/stores/auth-store'
@@ -9,7 +9,7 @@ import { useLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { handleErrorApi } from '@/utils/error'
 import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from '@/utils/local-storage'
 
-export default function LogoutPage() {
+function LogoutPageWithoutSuspense() {
   // Prevent multiple requests
   const logOutRef = useRef<unknown>(null)
 
@@ -60,4 +60,12 @@ export default function LogoutPage() {
   }, [accessTokenFromUrl, nLogoutMutateAsync, refreshTokenFromUrl, router, setIsAuth, setMe])
 
   return null
+}
+
+export default function LogoutPage() {
+  return (
+    <Suspense>
+      <LogoutPageWithoutSuspense />
+    </Suspense>
+  )
 }
