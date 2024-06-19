@@ -4,5 +4,5 @@ import mediaApi from '@/api-requests/media.api'
 import { QueryKey } from '@/constants/query-key'
 
 export function useUploadImageMutation() {
-  return useMutation({ mutationFn: mediaApi.uploadImageFromBrowserToBackend, mutationKey: [QueryKey.bUploadImage] })
+  return useMutation({ mutationFn: mediaApi.uploadImageFromBrowserToBackend, mutationKey: [QueryKey.uploadImage] })
 }

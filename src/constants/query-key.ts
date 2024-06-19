@@ -1,14 +1,19 @@
 export const QueryKey = {
   // Auth API
-  nLogin: 'nLogin',
-  nLogout: 'nLogout',
-  nRefreshToken: 'nRefreshToken',
+  login: 'login',
+  logout: 'logout',
+  refreshToken: 'refreshToken',
 
   // Account API
-  bGetMe: 'bGetMe',
-  bUpdateMe: 'bUpdateMe',
-  bChangePassword: 'bChangePassword',
+  getMe: 'getMe',
+  updateMe: 'updateMe',
+  changePassword: 'changePassword',
+  getEmployees: 'getEmployees',
+  addEmployee: 'addEmployee',
+  getEmployee: 'getEmployee',
+  updateEmployee: 'updateEmployee',
+  deleteEmployee: 'deleteEmployee',
 
   // Media API
-  bUploadImage: 'bUploadImage',
+  uploadImage: 'uploadImage',
 } as const
