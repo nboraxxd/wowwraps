@@ -41,15 +41,18 @@ import {
 } from '@/components/ui/alert-dialog'
 import { AutoPagination } from '@/components/common'
 import { AddEmployee, EditEmployee } from '@/app/manage/_components'
+import { useGetEmployeesQuery } from '@/lib/tanstack-query/use-account'
 
 type AccountItem = AccountListResType['data'][0]
 
-const AccountTableContext = createContext<{
+type AccountTableContextType = {
   setEmployeeIdEdit: (value: number) => void
   employeeIdEdit: number | undefined
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
-}>({
+}
+
+const AccountTableContext = createContext<AccountTableContextType>({
   setEmployeeIdEdit: (value: number | undefined) => {},
   employeeIdEdit: undefined,
   employeeDelete: null,
@@ -88,7 +91,7 @@ export const columns: ColumnDef<AccountType>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
+    cell: ({ row }) => <div>{row.getValue('email')}</div>,
   },
   {
     id: 'actions',
@@ -166,7 +169,6 @@ export default function AccountTable() {
 
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -175,6 +177,10 @@ export default function AccountTable() {
     pageIndex, // Giá trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, // default page size
   })
+
+  const getEmployeesQuery = useGetEmployeesQuery()
+
+  const data = getEmployeesQuery.isSuccess ? getEmployeesQuery.data.payload.data : []
 
   const table = useReactTable({
     data,

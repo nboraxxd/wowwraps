@@ -21,17 +21,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 
-export default function EditEmployee({
-  id,
-  setId,
-  onSubmitSuccess,
-}: {
+interface Props {
   id?: number | undefined
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
-}) {
+}
+
+export default function EditEmployee({ id, setId, onSubmitSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null)
+
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
+
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -43,9 +43,11 @@ export default function EditEmployee({
       changePassword: false,
     },
   })
+
   const avatar = form.watch('avatar')
   const name = form.watch('name')
   const changePassword = form.watch('changePassword')
+
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file)

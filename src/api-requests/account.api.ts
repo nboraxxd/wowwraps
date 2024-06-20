@@ -25,7 +25,7 @@ const accountApi = {
   changePasswordFromBrowserToBackend: (body: ChangePasswordBodyType) =>
     http.put<AccountResType>(`${PREFIX}/change-password`, body),
 
-  getEmployeesFromBrowserToBackend: () => http.get<AccountListResType[]>(PREFIX),
+  getEmployeesFromBrowserToBackend: () => http.get<AccountListResType>(PREFIX),
 
   addEmployeeFromBrowserToBackend: (body: CreateEmployeeAccountBodyType) => http.post<AccountResType>(PREFIX, body),
 
