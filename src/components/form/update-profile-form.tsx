@@ -171,7 +171,7 @@ export default function UpdateProfileForm() {
                 <Button
                   size="sm"
                   type="submit"
-                  className="gap-1"
+                  className="gap-1.5"
                   disabled={uploadImageMutation.isPending || updateMeMutation.isPending}
                 >
                   {uploadImageMutation.isPending || updateMeMutation.isPending ? (

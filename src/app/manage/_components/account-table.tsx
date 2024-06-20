@@ -53,10 +53,10 @@ type AccountTableContextType = {
 }
 
 const AccountTableContext = createContext<AccountTableContextType>({
-  setEmployeeIdEdit: (value: number | undefined) => {},
+  setEmployeeIdEdit: () => {},
   employeeIdEdit: undefined,
   employeeDelete: null,
-  setEmployeeDelete: (value: AccountItem | null) => {},
+  setEmployeeDelete: () => {},
 })
 
 export const columns: ColumnDef<AccountType>[] = [

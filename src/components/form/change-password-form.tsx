@@ -57,7 +57,6 @@ export default function ChangePasswordForm() {
           <CardContent>
             <div className="grid gap-6">
               {/* Email */}
-
               <div className="hidden">
                 <FormLabel>Email</FormLabel>
                 <FormControl>

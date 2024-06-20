@@ -2,9 +2,9 @@
 
 import { toast } from 'sonner'
 import { useMemo, useRef, useState } from 'react'
-import { PlusCircle, Upload } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { LoaderCircleIcon, PlusCircle, Upload } from 'lucide-react'
 
 import { handleErrorApi } from '@/utils/error'
 import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
@@ -74,6 +74,7 @@ export default function AddEmployee() {
       const response = await addEmployeeMutation.mutateAsync(body)
 
       toast.success(response.payload.message)
+      setFile(null)
       form.reset()
       setOpen(false)
     } catch (error) {
@@ -214,7 +215,15 @@ export default function AddEmployee() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="add-employee-form">
+          <Button
+            type="submit"
+            form="add-employee-form"
+            className="gap-1.5"
+            disabled={uploadImageMutation.isPending || addEmployeeMutation.isPending}
+          >
+            {uploadImageMutation.isPending || addEmployeeMutation.isPending ? (
+              <LoaderCircleIcon className="size-4 animate-spin" />
+            ) : null}
             Thêm
           </Button>
         </DialogFooter>

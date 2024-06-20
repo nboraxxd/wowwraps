@@ -1,8 +1,8 @@
 import { Suspense } from 'react'
+import { LoaderCircleIcon } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AccountTable } from '@/app/manage/_components'
-import { SpinnerIcon } from '@/components/icons'
 
 export default function AccountsPage() {
   return (
@@ -17,7 +17,7 @@ export default function AccountsPage() {
             <Suspense
               fallback={
                 <div className="my-24 flex items-center justify-center">
-                  <SpinnerIcon className="size-8 animate-spin" />
+                  <LoaderCircleIcon className="size-8 animate-spin" />
                 </div>
               }
             >

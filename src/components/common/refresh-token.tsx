@@ -1,11 +1,13 @@
 'use client'
 
+import ms from 'ms'
 import { toast } from 'sonner'
 import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { checkAndRefreshToken } from '@/utils'
 import { useAuthStore } from '@/lib/stores/auth-store'
+import envConfig from '@/constants/config'
 
 // không check refresh token cho các path này
 const UNAUTHENTICATED_PATHS = ['/login', '/logout', '/refresh-token']
@@ -50,7 +52,7 @@ export default function RefreshToken() {
     // Timeout interval phải nhỏ hơn thời gian hết hạn của access token
     // Ví dụ access token hết hạn sau 30s thì 10s chúng ta sẽ check refresh token 1 lần
     // TIMEOUT phải nhỏ hơn 1/3 thời gian hết hạn của access token
-    const TIMEOUT = 8000
+    const refreshTokenCheckInterval = ms(envConfig.REFRESH_TOKEN_CHECK_INTERVAL)
     interval = setInterval(
       () =>
         checkAndRefreshToken({
@@ -59,7 +61,7 @@ export default function RefreshToken() {
           },
           onError,
         }),
-      TIMEOUT
+      refreshTokenCheckInterval
     )
 
     return () => {

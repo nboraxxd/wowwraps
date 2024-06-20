@@ -68,10 +68,15 @@ export function useAddEmployeeMutation() {
   })
 }
 
-export function useGetEmployeeQuery(id: AccountIdParamType['id']) {
+export function useGetEmployeeQuery(id?: AccountIdParamType['id'], onSuccess?: (data: AccountResType) => void) {
   return useQuery({
-    queryFn: () => accountApi.getEmployeeFromBrowserToBackend(id),
+    queryFn: () =>
+      accountApi.getEmployeeFromBrowserToBackend(id!).then((res) => {
+        onSuccess && onSuccess(res.payload)
+        return res
+      }),
     queryKey: [QueryKey.getEmployee, id],
+    enabled: Boolean(id),
   })
 }
 
@@ -81,9 +86,10 @@ export function useUpdateEmployeeMutation() {
   return useMutation({
     mutationFn: ({ id, ...body }: UpdateEmployeeAccountBodyType & { id: AccountIdParamType['id'] }) =>
       accountApi.updateEmployeeFromBrowserToBackend(id, body),
-    onSuccess: (_, { id }) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKey.getEmployee, id],
+        queryKey: [QueryKey.getEmployees],
+        exact: true,
       })
     },
   })
