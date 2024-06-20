@@ -1,5 +1,6 @@
 'use client'
 
+import { toast } from 'sonner'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { CaretSortIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
@@ -16,6 +17,8 @@ import {
 } from '@tanstack/react-table'
 
 import { useSearchParams } from 'next/navigation'
+import { useDeleteEmployeeMutation, useGetEmployeesQuery } from '@/lib/tanstack-query/use-account'
+import { handleErrorApi } from '@/utils/error'
 import { AccountListResType, AccountType } from '@/lib/schemaValidations/account.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -41,7 +44,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { AutoPagination } from '@/components/common'
 import { AddEmployee, EditEmployee } from '@/app/manage/_components'
-import { useGetEmployeesQuery } from '@/lib/tanstack-query/use-account'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -71,7 +73,7 @@ export const columns: ColumnDef<AccountType>[] = [
       <div>
         <Avatar className="aspect-square size-[100px] rounded-md object-cover">
           <AvatarImage src={row.getValue('avatar')} />
-          <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
+          <AvatarFallback className="rounded-none p-1.5 text-center">{row.original.name}</AvatarFallback>
         </Avatar>
       </div>
     ),
@@ -132,11 +134,26 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
 }) {
+  const deleteEmployeeMutation = useDeleteEmployeeMutation()
+
+  async function onDeleteEmployee() {
+    if (!employeeDelete || deleteEmployeeMutation.isPending) return
+
+    try {
+      const response = await deleteEmployeeMutation.mutateAsync(employeeDelete.id)
+
+      toast.success(response.payload.message)
+      setEmployeeDelete(null)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
   return (
     <AlertDialog
       open={Boolean(employeeDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
+      onOpenChange={(open) => {
+        if (!open) {
           setEmployeeDelete(null)
         }
       }}
@@ -150,8 +167,10 @@ function AlertDialogDeleteAccount({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogCancel disabled={deleteEmployeeMutation.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onDeleteEmployee} disabled={deleteEmployeeMutation.isPending}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

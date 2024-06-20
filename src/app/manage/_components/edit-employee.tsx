@@ -120,8 +120,8 @@ export default function EditEmployee({ id, setId, onSubmitSuccess }: Props) {
   return (
     <Dialog
       open={Boolean(id)}
-      onOpenChange={(value) => {
-        if (!value) {
+      onOpenChange={(open) => {
+        if (!open) {
           onCloseDialog()
         }
       }}
