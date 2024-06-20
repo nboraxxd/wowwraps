@@ -3,7 +3,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import LoginForm from '@/components/form/login-form'
+import { LoginForm } from '@/components/form'
 
 const loginFields = [
   { label: 'Email', placeholder: 'bruce@wayne.dc' },

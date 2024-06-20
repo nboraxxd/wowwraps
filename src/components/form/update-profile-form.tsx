@@ -25,11 +25,7 @@ export default function UpdateProfileForm() {
 
   const isAuth = useAuthStore((state) => state.isAuth)
 
-  const {
-    data: getMeResponse,
-    isSuccess: isSuccessGetMe,
-    refetch: refreshGetMe,
-  } = useGetMeQuery({
+  const { data: getMeResponse, isSuccess: isSuccessGetMe } = useGetMeQuery({
     enabled: isAuth,
   })
 
@@ -82,7 +78,9 @@ export default function UpdateProfileForm() {
 
       const response = await updateMeMutation.mutateAsync(body)
 
-      refreshGetMe()
+      // Không cần phải refreshGetMe vì nó đã được tự động thực hiện bởi onSuccess của useUpdateMeMutation
+      // refreshGetMe()
+
       toast.success(response.payload.message)
     } catch (error) {
       handleErrorApi({ error, setError: form.setError })
@@ -122,7 +120,7 @@ export default function UpdateProfileForm() {
                       <div className="flex items-start justify-start gap-2">
                         <Avatar className="aspect-square size-[100px] rounded-md object-cover">
                           <AvatarImage src={previewAvatar} />
-                          <AvatarFallback className="rounded-none text-center">
+                          <AvatarFallback className="rounded-none p-1.5 text-center">
                             {getMeResponse?.payload.data.name}
                           </AvatarFallback>
                         </Avatar>

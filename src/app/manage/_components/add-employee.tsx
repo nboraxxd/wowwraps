@@ -1,10 +1,14 @@
 'use client'
 
+import { toast } from 'sonner'
 import { useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { PlusCircle, Upload } from 'lucide-react'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { handleErrorApi } from '@/utils/error'
+import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
+import { useAddEmployeeMutation } from '@/lib/tanstack-query/use-account'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -27,6 +31,9 @@ export default function AddEmployee() {
 
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
 
+  const uploadImageMutation = useUploadImageMutation()
+  const addEmployeeMutation = useAddEmployeeMutation()
+
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
     defaultValues: {
@@ -48,6 +55,32 @@ export default function AddEmployee() {
     return avatar
   }, [file, avatar])
 
+  async function onValid(values: CreateEmployeeAccountBodyType) {
+    if (uploadImageMutation.isPending || addEmployeeMutation.isPending) return
+
+    try {
+      let body = { ...values }
+
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const uploadImageResponse = await uploadImageMutation.mutateAsync(formData)
+        const imageUrl = uploadImageResponse.payload.data
+
+        body = { ...body, avatar: imageUrl }
+      }
+
+      const response = await addEmployeeMutation.mutateAsync(body)
+
+      toast.success(response.payload.message)
+      form.reset()
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -62,7 +95,12 @@ export default function AddEmployee() {
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="add-employee-form">
+          <form
+            noValidate
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="add-employee-form"
+            onSubmit={form.handleSubmit(onValid)}
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
@@ -72,7 +110,7 @@ export default function AddEmployee() {
                     <div className="flex items-start justify-start gap-2">
                       <Avatar className="aspect-square size-[100px] rounded-md object-cover">
                         <AvatarImage src={previewAvatarFromFile} />
-                        <AvatarFallback className="rounded-none">{name || 'Avatar'}</AvatarFallback>
+                        <AvatarFallback className="rounded-none p-1.5 text-center">{name || 'Avatar'}</AvatarFallback>
                       </Avatar>
                       <input
                         type="file"
@@ -108,7 +146,7 @@ export default function AddEmployee() {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="name">Tên</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="name" className="w-full" {...field} />
+                        <Input id="name" className="w-full" autoComplete="name" {...field} />
                         <FormMessage />
                       </div>
                     </div>
@@ -123,7 +161,7 @@ export default function AddEmployee() {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="email">Email</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="email" className="w-full" {...field} />
+                        <Input id="email" className="w-full" autoComplete="email" {...field} />
                         <FormMessage />
                       </div>
                     </div>
@@ -138,7 +176,13 @@ export default function AddEmployee() {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="password">Mật khẩu</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="password" className="w-full" type="password" {...field} />
+                        <Input
+                          id="password"
+                          className="w-full"
+                          type="password"
+                          autoComplete="new-password"
+                          {...field}
+                        />
                         <FormMessage />
                       </div>
                     </div>
@@ -153,7 +197,13 @@ export default function AddEmployee() {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Input id="confirmPassword" className="w-full" type="password" {...field} />
+                        <Input
+                          id="confirmPassword"
+                          className="w-full"
+                          type="password"
+                          autoComplete="new-password"
+                          {...field}
+                        />
                         <FormMessage />
                       </div>
                     </div>

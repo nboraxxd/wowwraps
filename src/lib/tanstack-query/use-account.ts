@@ -26,9 +26,16 @@ export function useGetMeQuery({ onSuccess, enabled = true }: GetMeQueryOptions) 
 }
 
 export function useUpdateMeMutation() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: accountApi.upadateMeFromBrowserToBackend,
     mutationKey: [QueryKey.updateMe],
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKey.getMe],
+      })
+    },
   })
 }
 
@@ -53,6 +60,7 @@ export function useAddEmployeeMutation() {
     mutationFn: accountApi.addEmployeeFromBrowserToBackend,
     mutationKey: [QueryKey.addEmployee],
     onSuccess: () => {
+      console.log('co chay vao day')
       queryClient.invalidateQueries({
         queryKey: [QueryKey.getEmployees],
       })
