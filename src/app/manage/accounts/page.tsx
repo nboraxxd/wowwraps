@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AccountTable } from '@/app/manage/_components'
+import AccountTable from '@/app/manage/accounts/account-table'
 
 export default function AccountsPage() {
   return (
