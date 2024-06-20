@@ -4,6 +4,9 @@ export const QueryKey = {
   logout: 'logout',
   refreshToken: 'refreshToken',
 
+  // Media API
+  uploadImage: 'uploadImage',
+
   // Account API
   getMe: 'getMe',
   updateMe: 'updateMe',
@@ -14,6 +17,10 @@ export const QueryKey = {
   updateEmployee: 'updateEmployee',
   deleteEmployee: 'deleteEmployee',
 
-  // Media API
-  uploadImage: 'uploadImage',
+  // Dish API
+  getDishes: 'getDishes',
+  getDish: 'getDish',
+  addDish: 'addDish',
+  updateDish: 'updateDish',
+  deleteDish: 'deleteDish',
 } as const

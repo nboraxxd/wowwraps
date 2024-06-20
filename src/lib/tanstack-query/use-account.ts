@@ -60,7 +60,6 @@ export function useAddEmployeeMutation() {
     mutationFn: accountApi.addEmployeeFromBrowserToBackend,
     mutationKey: [QueryKey.addEmployee],
     onSuccess: () => {
-      console.log('co chay vao day')
       queryClient.invalidateQueries({
         queryKey: [QueryKey.getEmployees],
       })
