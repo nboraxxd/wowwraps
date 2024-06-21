@@ -17,7 +17,7 @@ const dishApi = {
   addDishFromBrowserToBackend: (body: CreateDishBodyType) => http.post<DishResType>(PREFIX, body),
 
   updateDishBrowserToBackend: (id: DishParamsType['id'], body: UpdateDishBodyType) =>
-    http.post<DishResType>(`${PREFIX}/${id}`, body),
+    http.put<DishResType>(`${PREFIX}/${id}`, body),
 
   deleteDishFromBrowserToBackend: (id: DishParamsType['id']) => http.delete<DishResType>(`${PREFIX}/${id}`),
 }

@@ -1,7 +1,8 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import dishApi from '@/api-requests/dish.api'
 import { QueryKey } from '@/constants/query-key'
-import { DishParamsType, UpdateDishBodyType } from '@/lib/schemaValidations/dish.schema'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { DishParamsType, DishResType, UpdateDishBodyType } from '@/lib/schemaValidations/dish.schema'
 
 export function useGetDishesQuery() {
   return useQuery({
@@ -10,10 +11,15 @@ export function useGetDishesQuery() {
   })
 }
 
-export function useGetDishQuery(id: DishParamsType['id']) {
+export function useGetDishQuery(id?: DishParamsType['id'], onSuccess?: (data: DishResType) => void) {
   return useQuery({
-    queryFn: () => dishApi.getDishFromBrowserToBackend(id),
+    queryFn: () =>
+      dishApi.getDishFromBrowserToBackend(id!).then((response) => {
+        onSuccess && onSuccess(response.payload)
+        return response
+      }),
     queryKey: [QueryKey.getDish, id],
+    enabled: !!id,
   })
 }
 

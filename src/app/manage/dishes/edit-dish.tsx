@@ -1,13 +1,13 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Upload } from 'lucide-react'
+import { LoaderCircleIcon, Upload } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { getVietnameseDishStatus } from '@/utils'
 import { DishStatus, DishStatusValues } from '@/constants/type'
-import { UpdateDishBody, UpdateDishBodyType } from '@/lib/schemaValidations/dish.schema'
+import { DishResType, UpdateDishBody, UpdateDishBodyType } from '@/lib/schemaValidations/dish.schema'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -23,18 +23,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
+import { useGetDishQuery, useUpdateDishMutation } from '@/lib/tanstack-query/use-dish'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/utils/error'
 
-export default function EditDish({
-  id,
-  setId,
-  onSubmitSuccess,
-}: {
+interface Props {
   id?: number | undefined
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
-}) {
+}
+
+export default function EditDish({ id, setId, onSubmitSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null)
+
   const imageInputRef = useRef<HTMLInputElement | null>(null)
+
+  useGetDishQuery(id, onGetDishSuccess)
+  const uploadImageMutation = useUploadImageMutation()
+  const updateDishMutation = useUpdateDishMutation()
+
   const form = useForm<UpdateDishBodyType>({
     resolver: zodResolver(UpdateDishBody),
     defaultValues: {
@@ -45,14 +53,55 @@ export default function EditDish({
       status: DishStatus.Unavailable,
     },
   })
+
   const image = form.watch('image')
   const name = form.watch('name')
+
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file)
     }
     return image
   }, [file, image])
+
+  function onGetDishSuccess(response: DishResType) {
+    const {
+      data: { name, description, price, image, status },
+    } = response
+
+    console.log('🥴 ~ onGetDishSuccess ~ status:', status)
+
+    form.reset({ name, description, price, image, status })
+  }
+
+  async function onValid(values: UpdateDishBodyType) {
+    if (uploadImageMutation.isPending || updateDishMutation.isPending || !id) return
+
+    try {
+      const body = { ...values }
+
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const uploadImageResponse = await uploadImageMutation.mutateAsync(formData)
+
+        body.image = uploadImageResponse.payload.data
+      }
+
+      const updateDishResponse = await updateDishMutation.mutateAsync({ id, ...body })
+
+      onSubmitSuccess && onSubmitSuccess()
+
+      toast.success(updateDishResponse.payload.message)
+      form.reset()
+      setFile(null)
+      setId(undefined)
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
+
   return (
     <Dialog
       open={Boolean(id)}
@@ -68,7 +117,12 @@ export default function EditDish({
           <DialogDescription>Các trường sau đây là bắ buộc: Tên, ảnh</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="edit-dish-form">
+          <form
+            noValidate
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="edit-dish-form"
+            onSubmit={form.handleSubmit(onValid, (err) => console.log(err))}
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
@@ -159,7 +213,7 @@ export default function EditDish({
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Trạng thái</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Chọn trạng thái" />
@@ -184,8 +238,16 @@ export default function EditDish({
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="edit-dish-form">
-            Lưu
+          <Button
+            type="submit"
+            form="edit-dish-form"
+            className="gap-1.5"
+            disabled={uploadImageMutation.isPending || updateDishMutation.isPending}
+          >
+            {uploadImageMutation.isPending || updateDishMutation.isPending ? (
+              <LoaderCircleIcon className="size-4 animate-spin" />
+            ) : null}
+            Cập nhật
           </Button>
         </DialogFooter>
       </DialogContent>
