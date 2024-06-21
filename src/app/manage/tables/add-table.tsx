@@ -1,12 +1,15 @@
 'use client'
 
-import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
+import { LoaderCircleIcon, PlusCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { handleErrorApi } from '@/utils/error'
 import { getVietnameseTableStatus } from '@/utils'
 import { TableStatus, TableStatusValues } from '@/constants/type'
+import { useAddTableMutation } from '@/lib/tanstack-query/use-table'
 import { CreateTableBody, CreateTableBodyType } from '@/lib/schemaValidations/table.schema'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,6 +21,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 export default function AddTable() {
   const [open, setOpen] = useState(false)
 
+  const addTableMutation = useAddTableMutation()
+
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
     defaultValues: {
@@ -27,6 +32,20 @@ export default function AddTable() {
     },
   })
 
+  async function onValid(values: CreateTableBodyType) {
+    if (addTableMutation.isPending) return
+
+    try {
+      const response = await addTableMutation.mutateAsync(values)
+
+      toast.success(response.payload.message)
+      setOpen(false)
+      form.reset()
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -35,12 +54,17 @@ export default function AddTable() {
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Thêm bàn</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-screen overflow-auto sm:max-w-[600px]" onCloseAutoFocus={() => form.reset()}>
+      <DialogContent className="max-h-screen overflow-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Thêm bàn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="add-table-form">
+          <form
+            noValidate
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="add-table-form"
+            onSubmit={form.handleSubmit(onValid, (err) => console.log(err))}
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
@@ -80,7 +104,7 @@ export default function AddTable() {
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
                       <Label htmlFor="description">Trạng thái</Label>
                       <div className="col-span-3 w-full space-y-2">
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Chọn trạng thái" />
@@ -105,7 +129,8 @@ export default function AddTable() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="add-table-form">
+          <Button type="submit" form="add-table-form" className="gap-1.5" disabled={addTableMutation.isPending}>
+            {addTableMutation.isPending ? <LoaderCircleIcon className="size-4 animate-spin" /> : null}
             Thêm
           </Button>
         </DialogFooter>
