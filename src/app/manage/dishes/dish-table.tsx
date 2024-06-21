@@ -4,6 +4,7 @@ import DOMPurify from 'dompurify'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useSearchParams } from 'next/navigation'
+import { toast } from 'sonner'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -17,8 +18,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
+import { handleErrorApi } from '@/utils/error'
 import { formatCurrency, getVietnameseDishStatus } from '@/utils'
-import { useGetDishesQuery } from '@/lib/tanstack-query/use-dish'
+import { useDeleteDishMutation, useGetDishesQuery } from '@/lib/tanstack-query/use-dish'
 import { DishListResType } from '@/lib/schemaValidations/dish.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -141,11 +143,27 @@ function AlertDialogDeleteDish({
   dishDelete: DishItem | null
   setDishDelete: (value: DishItem | null) => void
 }) {
+  const deleteDishMutation = useDeleteDishMutation()
+
+  async function onDeleteDish() {
+    if (!dishDelete || deleteDishMutation.isPending) return
+
+    try {
+      const response = await deleteDishMutation.mutateAsync(dishDelete.id)
+
+      toast.success(response.payload.message)
+
+      setDishDelete(null)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
   return (
     <AlertDialog
-      open={Boolean(dishDelete)}
-      onOpenChange={(value) => {
-        if (!value) {
+      open={!!dishDelete}
+      onOpenChange={(open) => {
+        if (!open) {
           setDishDelete(null)
         }
       }}
@@ -159,8 +177,10 @@ function AlertDialogDeleteDish({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogCancel disabled={deleteDishMutation.isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onDeleteDish} disabled={deleteDishMutation.isPending}>
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -227,7 +247,7 @@ export default function DishTable() {
         <AlertDialogDeleteDish dishDelete={dishDelete} setDishDelete={setDishDelete} />
         <div className="flex items-center py-4">
           <Input
-            placeholder="Lọc tên"
+            placeholder="Lọc món ăn"
             value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
             onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
             className="max-w-sm"
