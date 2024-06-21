@@ -1,12 +1,15 @@
 'use client'
-
 import { useMemo, useRef, useState } from 'react'
-import { PlusCircle, Upload } from 'lucide-react'
+import { LoaderCircleIcon, PlusCircle, Upload } from 'lucide-react'
+import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
+import { handleErrorApi } from '@/utils/error'
 import { getVietnameseDishStatus } from '@/utils'
 import { DishStatus, DishStatusValues } from '@/constants/type'
+import { useAddDishMutation } from '@/lib/tanstack-query/use-dish'
+import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
 import { CreateDishBody, CreateDishBodyType } from '@/lib/schemaValidations/dish.schema'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +23,12 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 export default function AddDish() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
+
   const imageInputRef = useRef<HTMLInputElement | null>(null)
+
+  const uploadImageMutation = useUploadImageMutation()
+  const addDishMutation = useAddDishMutation()
+
   const form = useForm<CreateDishBodyType>({
     resolver: zodResolver(CreateDishBody),
     defaultValues: {
@@ -31,14 +39,39 @@ export default function AddDish() {
       status: DishStatus.Unavailable,
     },
   })
+
   const image = form.watch('image')
   const name = form.watch('name')
+
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file)
     }
     return image
   }, [file, image])
+
+  async function onValid(values: CreateDishBodyType) {
+    if (uploadImageMutation.isPending || addDishMutation.isPending || !file) return
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const uploadImageResponse = await uploadImageMutation.mutateAsync(formData)
+
+      const body = { ...values, image: uploadImageResponse.payload.data }
+
+      const addDishResponse = await addDishMutation.mutateAsync(body)
+
+      toast.success(addDishResponse.payload.message)
+
+      setFile(null)
+      form.reset()
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({ error, setError: form.setError })
+    }
+  }
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
@@ -53,7 +86,12 @@ export default function AddDish() {
           <DialogTitle>Thêm món ăn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className="grid auto-rows-max items-start gap-4 md:gap-8" id="add-dish-form">
+          <form
+            noValidate
+            className="grid auto-rows-max items-start gap-4 md:gap-8"
+            id="add-dish-form"
+            onSubmit={form.handleSubmit(onValid, (err) => console.log(err))}
+          >
             <div className="grid gap-4 py-4">
               <FormField
                 control={form.control}
@@ -63,7 +101,7 @@ export default function AddDish() {
                     <div className="flex items-start justify-start gap-2">
                       <Avatar className="aspect-square size-[100px] rounded-md object-cover">
                         <AvatarImage src={previewAvatarFromFile} />
-                        <AvatarFallback className="rounded-none">{name || 'Avatar'}</AvatarFallback>
+                        <AvatarFallback className="rounded-none p-1.5 text-center">{name || 'Dish'}</AvatarFallback>
                       </Avatar>
                       <input
                         type="file"
@@ -87,6 +125,7 @@ export default function AddDish() {
                         <span className="sr-only">Upload</span>
                       </button>
                     </div>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -169,7 +208,15 @@ export default function AddDish() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="add-dish-form">
+          <Button
+            type="submit"
+            form="add-dish-form"
+            className="gap-1.5"
+            disabled={uploadImageMutation.isPending || addDishMutation.isPending}
+          >
+            {uploadImageMutation.isPending || addDishMutation.isPending ? (
+              <LoaderCircleIcon className="size-4 animate-spin" />
+            ) : null}
             Thêm
           </Button>
         </DialogFooter>

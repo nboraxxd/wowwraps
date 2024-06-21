@@ -52,10 +52,10 @@ const DishTableContext = createContext<{
   dishDelete: DishItem | null
   setDishDelete: (value: DishItem | null) => void
 }>({
-  setDishIdEdit: (value: number | undefined) => {},
+  setDishIdEdit: (_value: number | undefined) => {},
   dishIdEdit: undefined,
   dishDelete: null,
-  setDishDelete: (value: DishItem | null) => {},
+  setDishDelete: (_value: DishItem | null) => {},
 })
 
 export const columns: ColumnDef<DishItem>[] = [
@@ -161,15 +161,18 @@ function AlertDialogDeleteDish({
     </AlertDialog>
   )
 }
+
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10
+
 export default function DishTable() {
   const searchParam = useSearchParams()
+
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
   const pageIndex = page - 1
+
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>()
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null)
-  const data: any[] = []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -178,6 +181,8 @@ export default function DishTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, // default page size
   })
+
+  const data: any[] = []
 
   const table = useReactTable({
     data,
