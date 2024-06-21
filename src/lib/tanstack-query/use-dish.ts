@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 export function useGetDishesQuery() {
   return useQuery({
     queryFn: dishApi.getDishesFromBrowserToBackend,
-    queryKey: [QueryKey.addDish],
+    queryKey: [QueryKey.getDishes],
   })
 }
 

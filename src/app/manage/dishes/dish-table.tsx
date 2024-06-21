@@ -1,5 +1,6 @@
 'use client'
 
+import DOMPurify from 'dompurify'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useSearchParams } from 'next/navigation'
@@ -17,6 +18,7 @@ import {
 } from '@tanstack/react-table'
 
 import { formatCurrency, getVietnameseDishStatus } from '@/utils'
+import { useGetDishesQuery } from '@/lib/tanstack-query/use-dish'
 import { DishListResType } from '@/lib/schemaValidations/dish.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -89,7 +91,10 @@ export const columns: ColumnDef<DishItem>[] = [
     accessorKey: 'description',
     header: 'Mô tả',
     cell: ({ row }) => (
-      <div dangerouslySetInnerHTML={{ __html: row.getValue('description') }} className="whitespace-pre-line" />
+      <div
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(row.getValue('description')) }}
+        className="whitespace-pre-line"
+      />
     ),
   },
   {
@@ -182,7 +187,9 @@ export default function DishTable() {
     pageSize: PAGE_SIZE, // default page size
   })
 
-  const data: any[] = []
+  const getDishesQuery = useGetDishesQuery()
+
+  const data = getDishesQuery.isSuccess ? getDishesQuery.data.payload.data : []
 
   const table = useReactTable({
     data,
