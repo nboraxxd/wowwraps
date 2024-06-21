@@ -23,4 +23,11 @@ export const QueryKey = {
   addDish: 'addDish',
   updateDish: 'updateDish',
   deleteDish: 'deleteDish',
+
+  // Table API
+  getTables: 'getTables',
+  getTable: 'getTable',
+  addTable: 'addTable',
+  updateTable: 'updateTable',
+  deleteTable: 'deleteTable',
 } as const
