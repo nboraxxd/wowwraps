@@ -16,7 +16,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { getVietnameseTableStatus } from '@/utils'
+import { getTableLink, getVietnameseTableStatus } from '@/utils'
+import { useGetTablesQuery } from '@/lib/tanstack-query/use-table'
 import { TableListResType } from '@/lib/schemaValidations/table.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -42,6 +43,7 @@ import {
 import { AutoPagination } from '@/components/common'
 import AddTable from '@/app/manage/tables/add-table'
 import EditTable from '@/app/manage/tables/edit-table'
+import QRCodeTable from '@/app/manage/tables/qrcode-table'
 
 type TableItem = TableListResType['data'][0]
 
@@ -76,7 +78,9 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'token',
     header: 'QR Code',
-    cell: ({ row }) => <div>{row.getValue('number')}</div>,
+    cell: ({ row }) => (
+      <QRCodeTable tableLink={getTableLink({ tableNumber: row.getValue('number'), token: row.getValue('token') })} />
+    ),
   },
   {
     id: 'actions',
@@ -151,7 +155,8 @@ export default function TableTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>()
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null)
-  const data: any[] = []
+  const tableListQuery = useGetTablesQuery()
+  const data = tableListQuery.data?.payload.data ?? []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
