@@ -16,7 +16,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import { getTableLink, getVietnameseTableStatus } from '@/utils'
+import { getVietnameseTableStatus } from '@/utils'
 import { useGetTablesQuery } from '@/lib/tanstack-query/use-table'
 import { TableListResType } from '@/lib/schemaValidations/table.schema'
 import { Input } from '@/components/ui/input'
@@ -78,9 +78,9 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'token',
     header: 'QR Code',
-    cell: ({ row }) => (
-      <QRCodeTable tableLink={getTableLink({ tableNumber: row.getValue('number'), token: row.getValue('token') })} />
-    ),
+    cell: ({ row }) => {
+      return <QRCodeTable tableNumber={row.getValue<number>('number')} tableToken={row.getValue<string>('token')} />
+    },
   },
   {
     id: 'actions',

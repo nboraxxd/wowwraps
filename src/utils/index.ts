@@ -97,6 +97,6 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
   }
 }
 
-export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
-  return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+export const getTableLink = ({ tableToken, tableNumber }: { tableToken: string; tableNumber: number }) => {
+  return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + tableToken
 }
