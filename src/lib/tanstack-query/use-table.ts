@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import tableApi from '@/api-requests/table.api'
 import { QueryKey } from '@/constants/query-key'
-import { TableParamsType, UpdateTableBodyType } from '@/lib/schemaValidations/table.schema'
+import { TableParamsType, TableResType, UpdateTableBodyType } from '@/lib/schemaValidations/table.schema'
 
 export function useGetTablesQuery() {
   return useQuery({
@@ -11,10 +11,15 @@ export function useGetTablesQuery() {
   })
 }
 
-export function useGetTableQuery(id: TableParamsType['number']) {
+export function useGetTableQuery(id?: TableParamsType['number'], onSuccess?: (data: TableResType) => void) {
   return useQuery({
-    queryFn: () => tableApi.getTableFromBrowserToBackend(id),
+    queryFn: () =>
+      tableApi.getTableFromBrowserToBackend(id!).then((response) => {
+        onSuccess && onSuccess(response.payload)
+        return response
+      }),
     queryKey: [QueryKey.getTable, id],
+    enabled: !!id,
   })
 }
 
@@ -32,7 +37,7 @@ export function useAddTableMutation() {
   })
 }
 
-export function useUpdateTableFromBrowserToBackend() {
+export function useUpdateTableMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -46,7 +51,7 @@ export function useUpdateTableFromBrowserToBackend() {
   })
 }
 
-export function useDeleteTableFromBrowserToBackend() {
+export function useDeleteTableMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({

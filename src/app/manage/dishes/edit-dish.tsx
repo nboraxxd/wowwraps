@@ -69,8 +69,6 @@ export default function EditDish({ id, setId, onSubmitSuccess }: Props) {
       data: { name, description, price, image, status },
     } = response
 
-    console.log('🥴 ~ onGetDishSuccess ~ status:', status)
-
     form.reset({ name, description, price, image, status })
   }
 

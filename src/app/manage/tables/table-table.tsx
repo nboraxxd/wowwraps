@@ -17,7 +17,7 @@ import {
 } from '@tanstack/react-table'
 
 import { getVietnameseTableStatus } from '@/utils'
-import { useGetTablesQuery } from '@/lib/tanstack-query/use-table'
+import { useDeleteTableMutation, useGetTablesQuery } from '@/lib/tanstack-query/use-table'
 import { TableListResType } from '@/lib/schemaValidations/table.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -44,6 +44,8 @@ import { AutoPagination } from '@/components/common'
 import AddTable from '@/app/manage/tables/add-table'
 import EditTable from '@/app/manage/tables/edit-table'
 import QRCodeTable from '@/app/manage/tables/qrcode-table'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/utils/error'
 
 type TableItem = TableListResType['data'][0]
 
@@ -64,6 +66,11 @@ export const columns: ColumnDef<TableItem>[] = [
     accessorKey: 'number',
     header: 'Số bàn',
     cell: ({ row }) => <div className="capitalize">{row.getValue('number')}</div>,
+    filterFn: (rows, columnId, filterValue) => {
+      if (!filterValue) return true
+
+      return filterValue.toString() === rows.getValue<number>('number').toString()
+    },
   },
   {
     accessorKey: 'capacity',
@@ -121,6 +128,21 @@ function AlertDialogDeleteTable({
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
 }) {
+  const { mutateAsync } = useDeleteTableMutation()
+
+  async function deleteTable() {
+    if (tableDelete) {
+      try {
+        const response = await mutateAsync(tableDelete.number)
+        setTableDelete(null)
+
+        toast.success(response.payload.message)
+      } catch (error) {
+        handleErrorApi({ error })
+      }
+    }
+  }
+
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -140,7 +162,7 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteTable}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
