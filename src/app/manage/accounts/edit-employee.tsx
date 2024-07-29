@@ -6,11 +6,7 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
-import {
-  AccountResType,
-  UpdateEmployeeAccountBody,
-  UpdateEmployeeAccountBodyType,
-} from '@/lib/schemaValidations/account.schema'
+import { AccountResType, UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/lib/schema/account.schema'
 import { useUploadImageMutation } from '@/lib/tanstack-query/use-media'
 import { useGetEmployeeQuery, useUpdateEmployeeMutation } from '@/lib/tanstack-query/use-account'
 import { handleErrorApi } from '@/utils/error'

@@ -5,7 +5,7 @@ import {
   TableParamsType,
   TableResType,
   UpdateTableBodyType,
-} from '@/lib/schemaValidations/table.schema'
+} from '@/lib/schema/table.schema'
 
 const PREFIX = '/tables'
 

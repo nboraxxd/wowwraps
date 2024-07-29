@@ -7,7 +7,7 @@ import {
   CreateEmployeeAccountBodyType,
   UpdateEmployeeAccountBodyType,
   UpdateMeBodyType,
-} from '@/lib/schemaValidations/account.schema'
+} from '@/lib/schema/account.schema'
 
 const PREFIX = '/accounts'
 

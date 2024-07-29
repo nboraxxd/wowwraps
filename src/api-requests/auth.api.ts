@@ -1,13 +1,13 @@
 import http from '@/utils/http'
 import envConfig from '@/constants/config'
-import { MessageResType } from '@/lib/schemaValidations/common.schema'
+import { MessageResType } from '@/lib/schema/common.schema'
 import {
   LoginBodyType,
   LoginResType,
   LogoutBodyType,
   RefreshTokenBodyType,
   RefreshTokenResType,
-} from '@/lib/schemaValidations/auth.schema'
+} from '@/lib/schema/auth.schema'
 
 const authApi = {
   refreshTokenFromBrowserToServerRequest: null as Promise<{ status: number; payload: RefreshTokenResType }> | null,

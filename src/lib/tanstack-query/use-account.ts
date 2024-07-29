@@ -2,11 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import accountApi from '@/api-requests/account.api'
 import { QueryKey } from '@/constants/query-key'
-import {
-  AccountIdParamType,
-  AccountResType,
-  UpdateEmployeeAccountBodyType,
-} from '@/lib/schemaValidations/account.schema'
+import { AccountIdParamType, AccountResType, UpdateEmployeeAccountBodyType } from '@/lib/schema/account.schema'
 
 type GetMeQueryOptions = {
   onSuccess?: (data: AccountResType) => void

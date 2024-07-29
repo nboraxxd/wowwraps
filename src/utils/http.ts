@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import envConfig from '@/constants/config'
-import { LoginResType } from '@/lib/schemaValidations/auth.schema'
+import { LoginResType } from '@/lib/schema/auth.schema'
 import { isBrowser, addFirstSlashToUrl } from '@/utils'
 import {
   getAccessTokenFromLocalStorage,

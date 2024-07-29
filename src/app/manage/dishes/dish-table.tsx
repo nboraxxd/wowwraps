@@ -21,7 +21,7 @@ import {
 import { handleErrorApi } from '@/utils/error'
 import { formatCurrency, getVietnameseDishStatus } from '@/utils'
 import { useDeleteDishMutation, useGetDishesQuery } from '@/lib/tanstack-query/use-dish'
-import { DishListResType } from '@/lib/schemaValidations/dish.schema'
+import { DishListResType } from '@/lib/schema/dish.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

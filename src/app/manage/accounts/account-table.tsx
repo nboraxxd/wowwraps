@@ -19,7 +19,7 @@ import {
 import { useSearchParams } from 'next/navigation'
 import { useDeleteEmployeeMutation, useGetEmployeesQuery } from '@/lib/tanstack-query/use-account'
 import { handleErrorApi } from '@/utils/error'
-import { AccountListResType, AccountType } from '@/lib/schemaValidations/account.schema'
+import { AccountListResType, AccountType } from '@/lib/schema/account.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

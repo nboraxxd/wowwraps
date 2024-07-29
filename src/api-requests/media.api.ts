@@ -1,5 +1,5 @@
 import http from '@/utils/http'
-import { UploadImageResType } from '@/lib/schemaValidations/media.schema'
+import { UploadImageResType } from '@/lib/schema/media.schema'
 
 const mediaApi = {
   // API OF BACKEND SERVER

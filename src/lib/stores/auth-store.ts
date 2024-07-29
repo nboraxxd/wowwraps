@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
-import { LoginResType } from '@/lib/schemaValidations/auth.schema'
+import { LoginResType } from '@/lib/schema/auth.schema'
 
 type AuthStore = {
   isAuth: boolean

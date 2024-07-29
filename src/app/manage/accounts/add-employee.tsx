@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/lib/schemaValidations/account.schema'
+import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/lib/schema/account.schema'
 import {
   Dialog,
   DialogContent,

@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 import dishApi from '@/api-requests/dish.api'
 import { formatCurrency } from '@/utils'
-import { DishListResType } from '@/lib/schemaValidations/dish.schema'
+import { DishListResType } from '@/lib/schema/dish.schema'
 
 export default async function Homepage() {
   let dishes: DishListResType['data'] = []

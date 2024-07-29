@@ -4,7 +4,7 @@ import {
   DishParamsType,
   DishResType,
   UpdateDishBodyType,
-} from '@/lib/schemaValidations/dish.schema'
+} from '@/lib/schema/dish.schema'
 import http from '@/utils/http'
 
 const PREFIX = '/dishes'

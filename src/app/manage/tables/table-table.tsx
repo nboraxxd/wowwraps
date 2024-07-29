@@ -18,7 +18,7 @@ import {
 
 import { getVietnameseTableStatus } from '@/utils'
 import { useDeleteTableMutation, useGetTablesQuery } from '@/lib/tanstack-query/use-table'
-import { TableListResType } from '@/lib/schemaValidations/table.schema'
+import { TableListResType } from '@/lib/schema/table.schema'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'

@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import authApi from '@/api-requests/auth.api'
 import { TokenPayload } from '@/types/jwt.types'
 import { HttpError } from '@/utils/http'
-import { LoginBodyType } from '@/lib/schemaValidations/auth.schema'
+import { LoginBodyType } from '@/lib/schema/auth.schema'
 
 export async function POST(request: Request) {
   const body = (await request.json()) as LoginBodyType

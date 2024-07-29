@@ -1,7 +1,7 @@
 import z from 'zod'
 
 import { DishStatusValues, RoleValues } from '@/constants/type'
-import { AccountSchema } from '@/lib/schemaValidations/account.schema'
+import { AccountSchema } from '@/lib/schema/account.schema'
 
 export const GuestLoginBody = z
   .object({

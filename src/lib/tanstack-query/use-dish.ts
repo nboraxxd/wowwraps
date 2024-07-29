@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import dishApi from '@/api-requests/dish.api'
 import { QueryKey } from '@/constants/query-key'
-import { DishParamsType, DishResType, UpdateDishBodyType } from '@/lib/schemaValidations/dish.schema'
+import { DishParamsType, DishResType, UpdateDishBodyType } from '@/lib/schema/dish.schema'
 import revalidateApi from '@/api-requests/revalidate.api'
 
 export function useGetDishesQuery() {
@@ -59,10 +59,11 @@ export function useDeleteDishMutation() {
 
   return useMutation({
     mutationFn: dishApi.deleteDishFromBrowserToBackend,
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({
         queryKey: [QueryKey.getDishes],
       })
+      await revalidateApi('dishes')
     },
   })
 }

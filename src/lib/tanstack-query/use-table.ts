@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import tableApi from '@/api-requests/table.api'
 import { QueryKey } from '@/constants/query-key'
-import { TableParamsType, TableResType, UpdateTableBodyType } from '@/lib/schemaValidations/table.schema'
+import { TableParamsType, TableResType, UpdateTableBodyType } from '@/lib/schema/table.schema'
 
 export function useGetTablesQuery() {
   return useQuery({
