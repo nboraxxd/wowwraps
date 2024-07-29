@@ -10,7 +10,7 @@ import http from '@/utils/http'
 const PREFIX = '/dishes'
 
 const dishApi = {
-  getDishesFromBrowserToBackend: () => http.get<DishListResType>(PREFIX),
+  getDishesFromBrowserToBackend: () => http.get<DishListResType>(PREFIX, { next: { tags: ['dishes'] } }),
 
   getDishFromBrowserToBackend: (id: DishParamsType['id']) => http.get<DishResType>(`${PREFIX}/${id}`),
 
