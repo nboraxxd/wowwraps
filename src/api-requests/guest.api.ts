@@ -1,25 +1,22 @@
 import http from '@/utils/http'
 import envConfig from '@/constants/config'
 import { MessageResType } from '@/lib/schema/common.schema'
-import {
-  LoginBodyType,
-  LoginResType,
-  LogoutBodyType,
-  RefreshTokenBodyType,
-  RefreshTokenResType,
-} from '@/lib/schema/auth.schema'
+import { GuestLoginBodyType, GuestLoginResType } from '@/lib/schema/guest.schema'
+import { LogoutBodyType, RefreshTokenBodyType, RefreshTokenResType } from '@/lib/schema/auth.schema'
 
-const authApi = {
+const PREFIX = '/guest'
+
+const guestApi = {
   refreshTokenFromBrowserToServerRequest: null as Promise<{ status: number; payload: RefreshTokenResType }> | null,
 
   // API OF BACKEND SERVER
-  loginFromServerToBackend: (body: LoginBodyType) => http.post<LoginResType>('/auth/login', body),
+  loginFromServerToBackend: (body: GuestLoginBodyType) => http.post<GuestLoginResType>(`${PREFIX}/auth/login`, body),
 
   // logoutFromServerToBackend sẽ được gọi từ Next.js server nên
   // sẽ cần tự lấy accessToken từ cookie để tự thêm vào header
   logoutFromServerToBackend: ({ accessToken, refreshToken }: LogoutBodyType & { accessToken: string }) =>
     http.post<MessageResType>(
-      '/auth/logout',
+      `${PREFIX}/auth/logout`,
       { refreshToken },
       { headers: { Authorization: `Bearer ${accessToken}` } }
     ),
@@ -27,22 +24,22 @@ const authApi = {
   // refreshTokenFromServerToBackend sẽ được gọi từ Next.js server nên
   // sẽ cần tự lấy refreshToken từ cookie để thêm vào body
   refreshTokenFromServerToBackend: (body: RefreshTokenBodyType) =>
-    http.post<RefreshTokenResType>('/auth/refresh-token', body),
+    http.post<RefreshTokenResType>(`${PREFIX}/auth/refresh-token`, body),
 
   // API OF NEXT.JS SERVER
-  loginFromBrowserToServer: (body: LoginBodyType) =>
-    http.post<LoginResType>('/api/auth/login', body, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
+  loginFromBrowserToServer: (body: GuestLoginBodyType) =>
+    http.post<GuestLoginResType>('/api/guest/auth/login', body, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
 
   // logoutFromBrowserToServer sẽ gọi từ Next.js client đến Next.js server
   // nên không cần truyền accessToken và refreshToken vì Next.js server sẽ tự lấy từ cookie
   logoutFromBrowserToServer: () =>
-    http.post<MessageResType>('/api/auth/logout', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
+    http.post<MessageResType>('/api/guest/auth/logout', {}, { baseUrl: envConfig.NEXT_PUBLIC_URL }),
 
   async refreshTokenFromBrowserToServer() {
     if (this.refreshTokenFromBrowserToServerRequest) return this.refreshTokenFromBrowserToServerRequest
 
     this.refreshTokenFromBrowserToServerRequest = http.post<RefreshTokenResType>(
-      '/api/auth/refresh-token',
+      '/api/guest/auth/refresh-token',
       {},
       { baseUrl: envConfig.NEXT_PUBLIC_URL }
     )
@@ -54,4 +51,4 @@ const authApi = {
   },
 }
 
-export default authApi
+export default guestApi

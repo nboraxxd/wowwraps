@@ -1,18 +1,18 @@
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
-import authApi from '@/api-requests/auth.api'
-import { TokenPayload } from '@/types/jwt.types'
+import guestApi from '@/api-requests/guest.api'
 import { HttpError } from '@/utils/http'
-import { LoginBodyType } from '@/lib/schema/auth.schema'
+import { TokenPayload } from '@/types/jwt.types'
+import { GuestLoginBodyType } from '@/lib/schema/guest.schema'
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as LoginBodyType
+  const body = (await request.json()) as GuestLoginBodyType
 
   const cookieStore = cookies()
 
   try {
-    const { payload } = await authApi.loginFromServerToBackend(body)
+    const { payload } = await guestApi.loginFromServerToBackend(body)
 
     const {
       data: { accessToken, refreshToken },
@@ -38,11 +38,12 @@ export async function POST(request: Request) {
     })
 
     return Response.json(payload)
-  } catch (error) {
+  } catch (error: any) {
+    console.log('🔥 ~ POST ~ error:', error)
     if (error instanceof HttpError) {
       return Response.json(error.payload, { status: error.status })
     } else {
-      return Response.json({ message: 'Internal Server Error' }, { status: 500 })
+      return Response.json({ message: error.message }, { status: 500 })
     }
   }
 }
