@@ -14,7 +14,7 @@ export default function Layout({
 }>) {
   return (
     <div className="relative flex min-h-screen w-full flex-col">
-      <header className="sticky top-0 flex h-header-height items-center gap-4 border-b bg-background px-4 md:px-6">
+      <header className="sticky top-0 z-30 flex h-header-height items-center gap-4 border-b bg-background px-4 md:px-6">
         {/* Nav on desktop */}
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link href="/" className="flex items-center gap-2 text-lg font-semibold md:text-base">

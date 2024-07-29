@@ -1,5 +1,8 @@
+import { Suspense } from 'react'
+import { LoaderCircleIcon } from 'lucide-react'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import DishTable from '@/app/manage/tables/table-table'
+import TableTable from '@/app/manage/tables/table-table'
 
 export default function TablesPage() {
   return (
@@ -11,7 +14,15 @@ export default function TablesPage() {
             <CardDescription>Quản lý bàn ăn</CardDescription>
           </CardHeader>
           <CardContent>
-            <DishTable />
+            <Suspense
+              fallback={
+                <div className="my-24 flex items-center justify-center">
+                  <LoaderCircleIcon className="size-8 animate-spin" />
+                </div>
+              }
+            >
+              <TableTable />
+            </Suspense>
           </CardContent>
         </Card>
       </div>

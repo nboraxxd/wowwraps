@@ -72,7 +72,11 @@ export async function checkAndRefreshToken(params?: { onSuccess?: () => void; on
 }
 
 export const formatCurrency = (number: number) => {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number)
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+    .format(number)
+    .replace('₫', '')
+    .trim()
+    .concat('đ')
 }
 
 export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
