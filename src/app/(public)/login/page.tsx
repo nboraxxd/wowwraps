@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -19,7 +20,7 @@ export default function LoginPage() {
           <CardDescription>Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống</CardDescription>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<AuthFormSkeleton itemList={loginFields} />}>
+          <Suspense fallback={<LoginFormSkeleton itemList={loginFields} />}>
             <LoginForm />
           </Suspense>
         </CardContent>
@@ -28,7 +29,7 @@ export default function LoginPage() {
   )
 }
 
-function AuthFormSkeleton({ itemList }: { itemList: Array<{ label: string; placeholder: string }> }) {
+function LoginFormSkeleton({ itemList }: { itemList: Array<{ label: string; placeholder: string }> }) {
   return (
     <div className="grid gap-4">
       {itemList.map(({ label, placeholder }, i) => (

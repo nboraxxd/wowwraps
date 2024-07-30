@@ -13,6 +13,7 @@ import envConfig from '@/constants/config'
 const UNAUTHENTICATED_PATHS = ['/login', '/logout', '/refresh-token']
 
 export default function RefreshToken() {
+  const role = useAuthStore((state) => state.role)
   const setRole = useAuthStore((state) => state.setRole)
 
   const pathname = usePathname()
@@ -50,22 +51,24 @@ export default function RefreshToken() {
     // Timeout interval phải nhỏ hơn thời gian hết hạn của access token
     // Ví dụ access token hết hạn sau 30s thì 10s chúng ta sẽ check refresh token 1 lần
     // TIMEOUT phải nhỏ hơn 1/3 thời gian hết hạn của access token
-    const refreshTokenCheckInterval = ms(envConfig.REFRESH_TOKEN_CHECK_INTERVAL)
-    interval = setInterval(
-      () =>
-        checkAndRefreshToken({
-          onSuccess: () => {
-            console.log('🚀 other checkAndRefreshToken')
-          },
-          onError,
-        }),
-      refreshTokenCheckInterval
+    const refreshTokenCheckInterval = ms(
+      !role || role === 'Guest'
+        ? envConfig.GUEST_REFRESH_TOKEN_CHECK_INTERVAL
+        : envConfig.MANAGER_REFRESH_TOKEN_CHECK_INTERVAL
     )
+    interval = setInterval(() => {
+      checkAndRefreshToken({
+        onSuccess: () => {
+          console.log('🚀 other checkAndRefreshToken')
+        },
+        onError,
+      })
+    }, refreshTokenCheckInterval)
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [pathname, router, setRole])
+  }, [pathname, role, router, setRole])
 
   return null
 }

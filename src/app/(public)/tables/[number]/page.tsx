@@ -1,7 +1,16 @@
+import { RedirectType, redirect } from 'next/navigation'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { GuestLoginForm } from '@/components/form'
 
-export default function TableNumberPage() {
+interface Props {
+  params: { number: string }
+  searchParams: { token?: string }
+}
+
+export default function TableNumberPage({ params: { number }, searchParams: { token } }: Props) {
+  if (!token) redirect('/', RedirectType.replace)
+
   return (
     <div className="flex min-h-[calc(100vh-var(--header-height))] items-center justify-center">
       <Card className="mx-auto max-w-sm">
@@ -10,7 +19,7 @@ export default function TableNumberPage() {
           <CardDescription>Vui lòng nhập thông tin để được phục vụ tốt nhất</CardDescription>
         </CardHeader>
         <CardContent>
-          <GuestLoginForm />
+          <GuestLoginForm token={token} tableNumber={+number} />
         </CardContent>
       </Card>
     </div>

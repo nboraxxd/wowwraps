@@ -4,8 +4,9 @@ import { type ClassValue, clsx } from 'clsx'
 
 import envConfig from '@/constants/config'
 import authApi from '@/api-requests/auth.api'
+import guestApi from '@/api-requests/guest.api'
 import { RoleType, TokenPayload } from '@/types/jwt.types'
-import { DishStatus, TableStatus } from '@/constants/type'
+import { DishStatus, Role, TableStatus } from '@/constants/type'
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
@@ -58,13 +59,19 @@ export async function checkAndRefreshToken(params?: { onSuccess?: (role?: RoleTy
   // thì tiến hành refresh token
   if (shouldRefreshToken) {
     try {
-      const response = await authApi.refreshTokenFromBrowserToServer()
+      const role = refreshTokenDecoded.role
+
+      const response =
+        role === Role.Guest
+          ? await guestApi.refreshTokenFromBrowserToServer()
+          : await authApi.refreshTokenFromBrowserToServer()
+
       const { accessToken, refreshToken } = response.payload.data
 
       setAccessTokenToLocalStorage(accessToken)
       setRefreshTokenToLocalStorage(refreshToken)
 
-      params?.onSuccess && params.onSuccess(accessTokenDecoded.role)
+      params?.onSuccess && params.onSuccess(role)
     } catch (error) {
       params?.onError && params.onError()
     }

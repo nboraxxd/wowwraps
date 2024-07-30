@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { redirect, useParams, useRouter, useSearchParams } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
@@ -13,13 +13,8 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 
-export default function GuestLoginForm() {
+export default function GuestLoginForm({ tableNumber, token }: { tableNumber: number; token: string }) {
   const router = useRouter()
-  const params = useParams()
-  const searchParams = useSearchParams()
-
-  const tableNumber = Number(params.number)
-  const token = searchParams.get('token')
 
   const setRole = useAuthStore((state) => state.setRole)
 
@@ -62,7 +57,7 @@ export default function GuestLoginForm() {
               <FormItem>
                 <div className="grid gap-2">
                   <Label htmlFor="name">Tên khách hàng</Label>
-                  <Input id="name" type="text" required {...field} />
+                  <Input id="name" type="text" placeholder="Bruce Wayne" required {...field} />
                   <FormMessage />
                 </div>
               </FormItem>
