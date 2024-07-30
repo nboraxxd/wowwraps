@@ -1,12 +1,10 @@
 'use client'
 
-import jwt from 'jsonwebtoken'
 import { Suspense, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
-import { checkAndRefreshToken } from '@/utils'
+import { checkAndRefreshToken, decodeToken } from '@/utils'
 import { getRefreshTokenFromLocalStorage } from '@/utils/local-storage'
-import { TokenPayload } from '@/types/jwt.types'
 import { useAuthStore } from '@/lib/stores/auth-store'
 
 function RefreshTokenPageWithoutSuspense() {
@@ -24,7 +22,7 @@ function RefreshTokenPageWithoutSuspense() {
       checkAndRefreshToken({
         onSuccess: () => {
           console.log('🚀 super first checkAndRefreshToken')
-          const refreshTokenDecoded = jwt.decode(refreshTokenFromUrl) as TokenPayload
+          const refreshTokenDecoded = decodeToken(refreshTokenFromUrl)
           setRole(refreshTokenDecoded.role)
 
           const from = new URLSearchParams()

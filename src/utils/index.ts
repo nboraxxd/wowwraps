@@ -34,8 +34,8 @@ export async function checkAndRefreshToken(params?: { onSuccess?: (role?: RoleTy
   // Chưa đăng nhập thì không cần check refresh token
   if (!accessToken || !refreshToken) return
 
-  const accessTokenDecoded = jwt.decode(accessToken) as TokenPayload
-  const refreshTokenDecoded = jwt.decode(refreshToken) as TokenPayload
+  const accessTokenDecoded = decodeToken(accessToken)
+  const refreshTokenDecoded = decodeToken(refreshToken)
 
   // Thời điểm hết hạn của token được tính theo epoch time (s)
   // Còn khi dùng cú pháp `new Date().getTime()` thì nó sẽ trả về epoch time (ms)
@@ -103,4 +103,8 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 
 export const getTableLink = ({ tableToken, tableNumber }: { tableToken: string; tableNumber: number }) => {
   return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + tableToken
+}
+
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload
 }

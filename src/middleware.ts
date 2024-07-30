@@ -1,8 +1,7 @@
-import jwt from 'jsonwebtoken'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import { TokenPayload } from '@/types/jwt.types'
+import { decodeToken } from '@/utils'
 
 const authorizedPaths = ['/guest']
 const unauthenticatedPaths = ['/login', '/tables']
@@ -31,7 +30,7 @@ export function middleware(request: NextRequest) {
 
   // Redirect to home page if not owner or employee
   if (adminPaths.some((item) => pathname.startsWith(item)) && refreshToken) {
-    const refreshTokenDecoded = jwt.decode(refreshToken) as TokenPayload
+    const refreshTokenDecoded = decodeToken(refreshToken)
 
     if (!['Owner', 'Employee'].includes(refreshTokenDecoded.role)) {
       return NextResponse.redirect(new URL('/', request.url))

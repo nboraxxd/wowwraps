@@ -1,8 +1,7 @@
-import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
 import guestApi from '@/api-requests/guest.api'
-import { TokenPayload } from '@/types/jwt.types'
+import { decodeToken } from '@/utils'
 
 export async function POST() {
   const cookieStore = cookies()
@@ -20,8 +19,8 @@ export async function POST() {
       data: { accessToken: newAccessToken, refreshToken: newRefreshToken },
     } = payload
 
-    const newAccessTokenDecoded = jwt.decode(newAccessToken) as TokenPayload
-    const newRefreshTokenDecoded = jwt.decode(newRefreshToken) as TokenPayload
+    const newAccessTokenDecoded = decodeToken(newAccessToken)
+    const newRefreshTokenDecoded = decodeToken(newRefreshToken)
 
     cookieStore.set('accessToken', newAccessToken, {
       path: '/',
