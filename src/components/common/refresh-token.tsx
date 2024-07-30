@@ -13,8 +13,7 @@ import envConfig from '@/constants/config'
 const UNAUTHENTICATED_PATHS = ['/login', '/logout', '/refresh-token']
 
 export default function RefreshToken() {
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
-  const setMe = useAuthStore((state) => state.setMe)
+  const setRole = useAuthStore((state) => state.setRole)
 
   const pathname = usePathname()
   const router = useRouter()
@@ -29,8 +28,7 @@ export default function RefreshToken() {
         clearInterval(interval)
       }
 
-      setIsAuth(false)
-      setMe(null)
+      setRole(undefined)
 
       const next = new URLSearchParams()
       next.set('next', pathname)
@@ -42,9 +40,9 @@ export default function RefreshToken() {
 
     // Phải gọi 1 lần đầu tiên vì interval sẽ chỉ chạy sau thời gian TIMEOUT
     checkAndRefreshToken({
-      onSuccess: () => {
+      onSuccess: (role) => {
         console.log('🚀 first checkAndRefreshToken')
-        setIsAuth(true)
+        setRole(role)
       },
       onError,
     })
@@ -67,7 +65,7 @@ export default function RefreshToken() {
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [pathname, router, setIsAuth, setMe])
+  }, [pathname, router, setRole])
 
   return null
 }

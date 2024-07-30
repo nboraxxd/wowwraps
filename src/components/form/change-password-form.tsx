@@ -16,10 +16,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function ChangePasswordForm() {
-  const isAuth = useAuthStore((state) => state.isAuth)
+  const role = useAuthStore((state) => state.role)
 
   const { data: getMeResponse } = useGetMeQuery({
-    enabled: isAuth,
+    enabled: role === 'Owner' || role === 'Employee',
   })
 
   const changePasswordMutation = useChangePasswordMutation()

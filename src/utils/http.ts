@@ -129,14 +129,14 @@ const request = async <Response>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', url:
   }
 
   // Client gọi đến Next.js API route để login
-  if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/login') {
+  if (['/api/auth/login', '/api/guest/auth/login'].includes(addFirstSlashToUrl(url)) && isBrowser) {
     const { accessToken, refreshToken } = (payload as LoginResType).data
 
     setAccessTokenToLocalStorage(accessToken)
     setRefreshTokenToLocalStorage(refreshToken)
 
     // Client gọi đến Next.js API route để logout
-  } else if (isBrowser && addFirstSlashToUrl(url) === '/api/auth/logout') {
+  } else if (['/api/auth/logout', '/api/guest/auth/logout'].includes(addFirstSlashToUrl(url)) && isBrowser) {
     removeTokensFromLocalStorage()
   }
 

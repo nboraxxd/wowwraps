@@ -23,10 +23,10 @@ export default function UpdateProfileForm() {
 
   const avatarInputRef = useRef<HTMLInputElement>(null)
 
-  const isAuth = useAuthStore((state) => state.isAuth)
+  const role = useAuthStore((state) => state.role)
 
   const { data: getMeResponse, isSuccess: isSuccessGetMe } = useGetMeQuery({
-    enabled: isAuth,
+    enabled: role === 'Owner' || role === 'Employee',
   })
 
   const updateMeMutation = useUpdateMeMutation()

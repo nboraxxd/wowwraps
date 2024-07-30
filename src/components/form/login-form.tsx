@@ -26,8 +26,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams()
   const next = searchParams.get('next')
 
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
-  const setMe = useAuthStore((state) => state.setMe)
+  const setRole = useAuthStore((state) => state.setRole)
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -54,8 +53,7 @@ export default function LoginForm() {
     try {
       const response = await loginToServerMutation.mutateAsync(values)
 
-      setIsAuth(true)
-      setMe(response.payload.data.account)
+      setRole(response.payload.data.account.role)
 
       const from = new URLSearchParams()
       from.set('from', pathname)

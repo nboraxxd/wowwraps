@@ -1,8 +1,13 @@
+import jwt from 'jsonwebtoken'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const authorizedPaths = ['/manage']
+import { TokenPayload } from '@/types/jwt.types'
+
+const authorizedPaths = ['/guest']
 const unauthenticatedPaths = ['/login', '/tables']
+
+const adminPaths = ['/manage']
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
@@ -22,6 +27,15 @@ export function middleware(request: NextRequest) {
   // Redirect to home page if has refresh token
   if (unauthenticatedPaths.some((item) => pathname.startsWith(item)) && refreshToken) {
     return NextResponse.redirect(new URL('/', request.url))
+  }
+
+  // Redirect to home page if not owner or employee
+  if (adminPaths.some((item) => pathname.startsWith(item)) && refreshToken) {
+    const refreshTokenDecoded = jwt.decode(refreshToken) as TokenPayload
+
+    if (!['Owner', 'Employee'].includes(refreshTokenDecoded.role)) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
   }
 
   // Logged in but access token has expired

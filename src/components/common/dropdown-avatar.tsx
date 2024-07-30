@@ -23,15 +23,14 @@ import { Skeleton } from '@/components/ui/skeleton'
 export default function DropdownAvatar() {
   const router = useRouter()
 
-  const setMe = useAuthStore((state) => state.setMe)
-  const isAuth = useAuthStore((state) => state.isAuth)
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
+  const role = useAuthStore((state) => state.role)
+  const setRole = useAuthStore((state) => state.setRole)
 
   const {
     data: getMeResponse,
     isLoading: isLoadingGetMe,
     isSuccess: isSuccessGetMe,
-  } = useGetMeQuery({ enabled: isAuth, onSuccess: (data) => setMe(data.data) })
+  } = useGetMeQuery({ enabled: role === 'Owner' || role === 'Employee' })
 
   const logoutToServerMutation = useLogoutToServerMutation()
 
@@ -41,8 +40,7 @@ export default function DropdownAvatar() {
     try {
       const response = await logoutToServerMutation.mutateAsync()
 
-      setIsAuth(false)
-      setMe(null)
+      setRole(undefined)
       toast(response.payload.message)
 
       router.push('/')
@@ -54,7 +52,7 @@ export default function DropdownAvatar() {
 
   if (isLoadingGetMe) return <Skeleton className="size-9 rounded-full" />
 
-  return isAuth && isSuccessGetMe ? (
+  return (role === 'Owner' || role === 'Employee') && isSuccessGetMe ? (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon" className="overflow-hidden rounded-full">

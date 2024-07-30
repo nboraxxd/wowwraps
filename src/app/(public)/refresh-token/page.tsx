@@ -1,14 +1,16 @@
 'use client'
 
+import jwt from 'jsonwebtoken'
 import { Suspense, useEffect } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import { checkAndRefreshToken } from '@/utils'
 import { getRefreshTokenFromLocalStorage } from '@/utils/local-storage'
+import { TokenPayload } from '@/types/jwt.types'
 import { useAuthStore } from '@/lib/stores/auth-store'
 
 function RefreshTokenPageWithoutSuspense() {
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
+  const setRole = useAuthStore((state) => state.setRole)
 
   const router = useRouter()
   const pathname = usePathname()
@@ -22,7 +24,8 @@ function RefreshTokenPageWithoutSuspense() {
       checkAndRefreshToken({
         onSuccess: () => {
           console.log('🚀 super first checkAndRefreshToken')
-          setIsAuth(true)
+          const refreshTokenDecoded = jwt.decode(refreshTokenFromUrl) as TokenPayload
+          setRole(refreshTokenDecoded.role)
 
           const from = new URLSearchParams()
           from.set('from', pathname)
@@ -33,7 +36,7 @@ function RefreshTokenPageWithoutSuspense() {
     } else {
       router.push('/')
     }
-  }, [nextPath, pathname, refreshTokenFromUrl, router, setIsAuth])
+  }, [nextPath, pathname, refreshTokenFromUrl, router, setRole])
 
   return null
 }

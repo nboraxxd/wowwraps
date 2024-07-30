@@ -31,7 +31,7 @@ const menuItems = [
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const isAuth = useAuthStore((state) => state.isAuth)
+  const role = useAuthStore((state) => state.role)
 
   const [mounted, setMounted] = useState(false)
 
@@ -42,7 +42,9 @@ export default function NavItems({ className }: { className?: string }) {
   if (!mounted) return null
 
   return menuItems.map((item) =>
-    item.authRequired === undefined || (!isAuth && !item.authRequired) || (isAuth && item.authRequired) ? (
+    item.authRequired === undefined ||
+    (!role && !item.authRequired) ||
+    ((role === 'Owner' || role === 'Employee') && item.authRequired) ? (
       <Link href={item.href} key={item.href} className={className}>
         {item.title}
       </Link>

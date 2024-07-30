@@ -12,21 +12,21 @@ interface Props {
 }
 
 export default function AuthProvider({ children }: Props) {
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
+  const setRole = useAuthStore((state) => state.setRole)
 
   useEffect(() => {
-    const isAuth = () => {
+    const getRole = () => {
       const accessToken = getAccessTokenFromLocalStorage()
+      if (!accessToken) return undefined
 
-      const accessTokenDecoded = accessToken ? (jwt.decode(accessToken) as TokenPayload) : null
-
+      const accessTokenDecoded = jwt.decode(accessToken) as TokenPayload
       const now = Math.floor(new Date().getTime() / 1000)
 
-      return accessTokenDecoded ? accessTokenDecoded.exp > now : false
+      return accessTokenDecoded.exp > now ? accessTokenDecoded.role : undefined
     }
 
-    setIsAuth(isAuth())
-  }, [setIsAuth])
+    setRole(getRole())
+  }, [setRole])
 
   return children
 }

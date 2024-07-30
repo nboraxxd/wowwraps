@@ -19,8 +19,7 @@ function LogoutPageWithoutSuspense() {
   const accessTokenFromUrl = searchParams.get('access-token')
   const refreshTokenFromUrl = searchParams.get('refresh-token')
 
-  const setMe = useAuthStore((state) => state.setMe)
-  const setIsAuth = useAuthStore((state) => state.setIsAuth)
+  const setRole = useAuthStore((state) => state.setRole)
 
   const { mutateAsync: nLogoutMutateAsync } = useLogoutToServerMutation()
 
@@ -37,8 +36,7 @@ function LogoutPageWithoutSuspense() {
         try {
           const response = await nLogoutMutateAsync()
 
-          setIsAuth(false)
-          setMe(null)
+          setRole(undefined)
           toast(response.payload.message)
           router.push('/')
           router.refresh()
@@ -57,7 +55,7 @@ function LogoutPageWithoutSuspense() {
     return () => {
       if (timeout) clearTimeout(timeout)
     }
-  }, [accessTokenFromUrl, nLogoutMutateAsync, refreshTokenFromUrl, router, setIsAuth, setMe])
+  }, [accessTokenFromUrl, nLogoutMutateAsync, refreshTokenFromUrl, router, setRole])
 
   return null
 }

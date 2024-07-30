@@ -4,7 +4,7 @@ import { type ClassValue, clsx } from 'clsx'
 
 import envConfig from '@/constants/config'
 import authApi from '@/api-requests/auth.api'
-import { TokenPayload } from '@/types/jwt.types'
+import { RoleType, TokenPayload } from '@/types/jwt.types'
 import { DishStatus, TableStatus } from '@/constants/type'
 import {
   getAccessTokenFromLocalStorage,
@@ -24,7 +24,7 @@ export const addFirstSlashToUrl = (url: string) => {
   return url.startsWith('/') ? url : `/${url}`
 }
 
-export async function checkAndRefreshToken(params?: { onSuccess?: () => void; onError?: () => void }) {
+export async function checkAndRefreshToken(params?: { onSuccess?: (role?: RoleType) => void; onError?: () => void }) {
   // Không nên đưa logic lấy access token và refresh token ra khỏi function `checkAndRefreshToken`
   // Vì để mỗi lần mà gọi function `checkAndRefreshToken` thì sẽ lấy access token và refresh token mới
   // Để tránh hiện tượng bug nó lấy access token và refresh token cũ ở lần đầu rồi gọi cho các lần tiếp theo
@@ -64,7 +64,7 @@ export async function checkAndRefreshToken(params?: { onSuccess?: () => void; on
       setAccessTokenToLocalStorage(accessToken)
       setRefreshTokenToLocalStorage(refreshToken)
 
-      params?.onSuccess && params.onSuccess()
+      params?.onSuccess && params.onSuccess(accessTokenDecoded.role)
     } catch (error) {
       params?.onError && params.onError()
     }
