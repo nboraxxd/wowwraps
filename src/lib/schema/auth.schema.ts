@@ -1,6 +1,5 @@
 import z from 'zod'
-
-import { RoleValues } from '@/constants/type'
+import { Role } from '@/constants/type'
 
 export const LoginBody = z
   .object({
@@ -19,7 +18,7 @@ export const LoginRes = z.object({
       id: z.number(),
       name: z.string(),
       email: z.string(),
-      role: z.enum(RoleValues),
+      role: z.enum([Role.Owner, Role.Employee]),
     }),
   }),
   message: z.string(),
@@ -52,3 +51,9 @@ export const LogoutBody = z
   .strict()
 
 export type LogoutBodyType = z.TypeOf<typeof LogoutBody>
+
+export const LoginGoogleQuery = z.object({
+  code: z.string(),
+})
+
+export type LoginGoogleQueryType = z.TypeOf<typeof LoginGoogleQuery>

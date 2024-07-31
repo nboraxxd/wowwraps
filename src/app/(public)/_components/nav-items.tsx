@@ -5,34 +5,39 @@ import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { Role } from '@/constants/type'
+import { RoleType } from '@/types/jwt.types'
 import { cn } from '@/utils'
 import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
 import { useLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { useGuestLogoutToServerMutation } from '@/lib/tanstack-query/use-guest'
 
-// authRequired = undefined: always show
-// authRequired = false: only show when user is not authenticated
-// authRequired = true: only show when user is authenticated
-const menuItems = [
+const menuItems: {
+  title: string
+  href: string
+  role?: RoleType[]
+  hideWhenLoggedIn?: boolean
+}[] = [
   {
-    title: 'Món ăn',
-    href: '/menu',
-  },
-  {
-    title: 'Đơn hàng',
-    href: '/orders',
-    authRequired: true,
+    title: 'Trang chủ',
+    href: '/',
+    role: [Role.Guest, Role.Owner, Role.Employee],
   },
   {
     title: 'Đăng nhập',
     href: '/login',
-    authRequired: false,
+    hideWhenLoggedIn: true,
+  },
+  {
+    title: 'Menu',
+    href: '/guest/menu',
+    role: [Role.Guest],
   },
   {
     title: 'Quản lý',
     href: '/manage/dashboard',
-    authRequired: true,
+    role: [Role.Owner, Role.Employee],
   },
 ]
 
@@ -71,15 +76,13 @@ export default function NavItems({ className }: { className?: string }) {
 
   return (
     <>
-      {menuItems.map((item) =>
-        item.authRequired === undefined ||
-        (!role && !item.authRequired) ||
-        ((role === 'Owner' || role === 'Employee') && item.authRequired) ? (
+      {menuItems.map((item) => {
+        return (role && item.role && item.role.includes(role)) || (!role && item.hideWhenLoggedIn === true) ? (
           <Link href={item.href} key={item.href} className={className}>
             {item.title}
           </Link>
         ) : null
-      )}
+      })}
       {role ? (
         <button className={cn('text-left', className)} onClick={handleLogout}>
           Đăng xuất
