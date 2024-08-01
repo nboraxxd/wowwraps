@@ -30,4 +30,10 @@ export const QueryKey = {
   addTable: 'addTable',
   updateTable: 'updateTable',
   deleteTable: 'deleteTable',
+
+  // Guest API
+  guestGetOrders: 'guestGetOrders',
+
+  // Order API
+  getOrders: 'getOrders',
 } as const

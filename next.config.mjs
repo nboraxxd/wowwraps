@@ -13,10 +13,6 @@ const nextConfig = {
         port: '4000',
         pathname: '/static/**',
       },
-      {
-        hostname: 'via.placeholder.com',
-        pathname: '/**',
-      },
     ],
   },
 }

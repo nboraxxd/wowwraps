@@ -1,8 +1,14 @@
 import http from '@/utils/http'
 import envConfig from '@/constants/config'
 import { MessageResType } from '@/lib/schema/common.schema'
-import { GuestLoginBodyType, GuestLoginResType } from '@/lib/schema/guest.schema'
 import { LogoutBodyType, RefreshTokenBodyType, RefreshTokenResType } from '@/lib/schema/auth.schema'
+import {
+  GuestCreateOrdersBodyType,
+  GuestCreateOrdersResType,
+  GuestGetOrdersResType,
+  GuestLoginBodyType,
+  GuestLoginResType,
+} from '@/lib/schema/guest.schema'
 
 const PREFIX = '/guest'
 
@@ -49,6 +55,11 @@ const guestApi = {
     this.refreshTokenFromBrowserToServerRequest = null
     return response
   },
+
+  orderFromBrowserToBackend: (body: GuestCreateOrdersBodyType) =>
+    http.post<GuestCreateOrdersResType>(`${PREFIX}/orders`, body),
+
+  getOrdersFromBrowserToBackend: () => http.get<GuestGetOrdersResType>(`${PREFIX}/orders`),
 }
 
 export default guestApi
