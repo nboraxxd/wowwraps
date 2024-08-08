@@ -6,7 +6,7 @@ import envConfig from '@/constants/config'
 import authApi from '@/api-requests/auth.api'
 import guestApi from '@/api-requests/guest.api'
 import { RoleType, TokenPayload } from '@/types/jwt.types'
-import { DishStatus, Role, TableStatus } from '@/constants/type'
+import { DishStatus, OrderStatus, Role, TableStatus } from '@/constants/type'
 import {
   getAccessTokenFromLocalStorage,
   getRefreshTokenFromLocalStorage,
@@ -105,6 +105,21 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
       return 'Đã đặt'
     default:
       return 'Ẩn'
+  }
+}
+
+export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+  switch (status) {
+    case OrderStatus.Delivered:
+      return 'Đã giao'
+    case OrderStatus.Paid:
+      return 'Đã thanh toán'
+    case OrderStatus.Pending:
+      return 'Chờ xử lý'
+    case OrderStatus.Processing:
+      return 'Đang làm món'
+    default:
+      return 'Từ chối'
   }
 }
 

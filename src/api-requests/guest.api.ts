@@ -56,7 +56,7 @@ const guestApi = {
     return response
   },
 
-  orderFromBrowserToBackend: (body: GuestCreateOrdersBodyType) =>
+  createOrderFromBrowserToBackend: (body: GuestCreateOrdersBodyType) =>
     http.post<GuestCreateOrdersResType>(`${PREFIX}/orders`, body),
 
   getOrdersFromBrowserToBackend: () => http.get<GuestGetOrdersResType>(`${PREFIX}/orders`),

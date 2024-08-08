@@ -13,8 +13,8 @@ export function useGuestLogoutToServerMutation() {
   return useMutation({ mutationFn: guestApi.logoutFromBrowserToServer })
 }
 
-export function useGuestOrderMutation() {
-  return useMutation({ mutationFn: guestApi.orderFromBrowserToBackend })
+export function useGuestCreateOrderMutation() {
+  return useMutation({ mutationFn: guestApi.createOrderFromBrowserToBackend })
 }
 
 export function useGuestGetOrdersQuery() {
