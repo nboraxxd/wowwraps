@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 interface Props {
   value: number
-  disabled: boolean
+  disabled?: boolean
   onChange: (value: number) => void
 }
 
