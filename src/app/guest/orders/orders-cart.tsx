@@ -1,14 +1,16 @@
 'use client'
 
 import Image from 'next/image'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
+import socket from '@/lib/socket'
 import { useGuestGetOrdersQuery } from '@/lib/tanstack-query/use-guest'
 import { formatCurrency, getVietnameseOrderStatus } from '@/utils'
 import { Badge } from '@/components/ui/badge'
+import { UpdateOrderResType } from '@/lib/schema/order.schema'
 
 export default function OrdersCart() {
-  const { data, isSuccess } = useGuestGetOrdersQuery()
+  const { data, isSuccess, refetch } = useGuestGetOrdersQuery()
 
   const orders = useMemo(() => (isSuccess ? data.payload.data : []), [data?.payload.data, isSuccess])
 
@@ -17,6 +19,34 @@ export default function OrdersCart() {
       return acc + order.quantity * order.dishSnapshot.price
     }, 0)
   }, [orders])
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+
+    function onConnect() {
+      console.log('connected', socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('disconnected')
+    }
+
+    function onOrderCreated(_data: UpdateOrderResType['data']) {
+      refetch()
+    }
+
+    socket.on('update-order', onOrderCreated)
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+
+    return () => {
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+    }
+  }, [refetch])
 
   return (
     <>

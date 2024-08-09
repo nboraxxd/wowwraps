@@ -111,7 +111,7 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
   switch (status) {
     case OrderStatus.Delivered:
-      return 'Đã giao'
+      return 'Đã hoàn thành'
     case OrderStatus.Paid:
       return 'Đã thanh toán'
     case OrderStatus.Pending:
