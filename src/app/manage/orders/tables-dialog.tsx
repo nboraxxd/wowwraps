@@ -49,15 +49,16 @@ const PAGE_SIZE = 10
 
 export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => void }) {
   const [open, setOpen] = useState(false)
-  const data: TableListResType['data'] = []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
-    pageIndex: 0, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
+    pageIndex: 0, // Giá trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, // default page size
   })
+
+  const data: TableListResType['data'] = []
 
   const table = useReactTable({
     data,

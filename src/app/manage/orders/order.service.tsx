@@ -20,6 +20,7 @@ export const useOrderService = (orderList: GetOrdersResType['data']) => {
     const guestByTableNumber: ServingGuestByTableNumber = {}
     orderList.forEach((order) => {
       statics.status[order.status] = statics.status[order.status] + 1
+
       // Nếu table và guest chưa bị xóa
       if (order.tableNumber !== null && order.guestId !== null) {
         if (!statics.table[order.tableNumber]) {

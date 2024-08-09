@@ -36,4 +36,5 @@ export const QueryKey = {
 
   // Order API
   getOrders: 'getOrders',
+  getOrderDetail: 'getOrderDetail',
 } as const

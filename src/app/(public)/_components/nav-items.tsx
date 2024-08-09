@@ -100,7 +100,7 @@ export default function NavItems({ className }: { className?: string }) {
           </Link>
         ) : null
       })}
-      {role ? (
+      {role === 'Guest' ? (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button className={cn('text-left', className)}>Đăng xuất</button>
@@ -120,7 +120,12 @@ export default function NavItems({ className }: { className?: string }) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      ) : undefined}
+      ) : null}
+      {role === 'Employee' || role === 'Owner' ? (
+        <button className={cn('text-left', className)} onClick={handleLogout}>
+          Đăng xuất
+        </button>
+      ) : null}
     </>
   )
 }

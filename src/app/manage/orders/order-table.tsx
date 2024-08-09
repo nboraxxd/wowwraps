@@ -18,6 +18,8 @@ import {
 
 import { OrderStatusValues } from '@/constants/type'
 import { getVietnameseOrderStatus, cn } from '@/utils'
+import { useGetOrdersQuery } from '@/lib/tanstack-query/use-order'
+import { useGetTablesQuery } from '@/lib/tanstack-query/use-table'
 import { GuestCreateOrdersResType } from '@/lib/schema/guest.schema'
 import { GetOrdersResType, PayGuestOrdersResType, UpdateOrderResType } from '@/lib/schema/order.schema'
 import { Input } from '@/components/ui/input'
@@ -56,25 +58,31 @@ export const OrderTableContext = createContext({
 const PAGE_SIZE = 10
 const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
+
 export default function OrderTable() {
-  const searchParam = useSearchParams()
-  const [openStatusFilter, setOpenStatusFilter] = useState(false)
-  const [fromDate, setFromDate] = useState(initFromDate)
-  const [toDate, setToDate] = useState(initToDate)
-  const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
+  const searchParams = useSearchParams()
+  const page = searchParams.get('page') ? Number(searchParams.get('page')) : 1
   const pageIndex = page - 1
+
+  const [toDate, setToDate] = useState(initToDate)
+  const [fromDate, setFromDate] = useState(initFromDate)
+  const [openStatusFilter, setOpenStatusFilter] = useState(false)
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
-  const orderList: any = []
-  const tableList: any = []
-  const tableListSortedByNumber = tableList.sort((a: any, b: any) => a.number - b.number)
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
-    pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
+    pageIndex, // Giá trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, // default page size
   })
+
+  const ordersQuery = useGetOrdersQuery({ fromDate, toDate })
+  const tablesQuery = useGetTablesQuery()
+
+  const orderList = ordersQuery.data?.payload.data ?? []
+  const tableList = tablesQuery.data?.payload.data ?? []
+  const tableListSortedByNumber = tableList.sort((a, b) => a.number - b.number)
 
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } = useOrderService(orderList)
 
@@ -225,41 +233,45 @@ export default function OrderTable() {
           tableList={tableListSortedByNumber}
           servingGuestByTableNumber={servingGuestByTableNumber}
         />
-        {/* <TableSkeleton /> */}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                    ))}
+        {ordersQuery.isLoading ? <TableSkeleton /> : null}
+        {ordersQuery.isSuccess ? (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      )
+                    })}
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={orderTableColumns.length} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={orderTableColumns.length} className="h-24 text-center">
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        ) : null}
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="flex-1 py-4 text-xs text-muted-foreground ">
             Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{' '}

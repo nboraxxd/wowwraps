@@ -20,40 +20,10 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { AutoPagination } from '@/components/common'
+import { useGetDishesQuery } from '@/lib/tanstack-query/use-dish'
 
 type DishItem = DishListResType['data'][0]
-const fakeData = [
-  {
-    id: 6,
-    name: 'bánh mì Việt nam',
-    price: 100000,
-    description: 'hello',
-    image: 'http://localhost:4000/static/6d05d144f70f4eadbd3a89428645e346.png',
-    status: 'Unavailable',
-    createdAt: '2024-06-26T04:31:09.710Z',
-    updatedAt: '2024-07-03T07:41:54.613Z',
-  },
-  {
-    id: 2,
-    name: 'Spaghetti 5',
-    price: 50000,
-    description: 'Mỳ ý',
-    image: 'http://localhost:4000/static/e0001b7e08604e0dbabf0d8f95e6174a.jpg',
-    status: 'Available',
-    createdAt: '2024-06-01T03:50:26.434Z',
-    updatedAt: '2024-07-03T07:42:34.917Z',
-  },
-  {
-    id: 1,
-    name: 'Beef steak',
-    price: 190000,
-    description: 'Bò bít tết Mỹ',
-    image: 'http://localhost:4000/static/4f2867ef88214b4b961e72cf05e093b4.jpg',
-    status: 'Available',
-    createdAt: '2024-06-01T03:45:43.148Z',
-    updatedAt: '2024-06-01T03:45:43.148Z',
-  },
-] as unknown as DishItem[]
+
 export const columns: ColumnDef<DishItem>[] = [
   {
     id: 'dishName',
@@ -87,18 +57,20 @@ export const columns: ColumnDef<DishItem>[] = [
   },
 ]
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 8
 export function DishesDialog({ onChoose }: { onChoose: (dish: DishItem) => void }) {
   const [open, setOpen] = useState(false)
-  const data = fakeData
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
-    pageIndex: 0, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
+    pageIndex: 0, // Giá trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE, // default page size
   })
+
+  const dishesQuery = useGetDishesQuery()
+  const data = dishesQuery.data?.payload.data ?? []
 
   const table = useReactTable({
     data,
