@@ -1,13 +1,14 @@
 'use client'
 
 import Image from 'next/image'
+import { toast } from 'sonner'
 import { useEffect, useMemo } from 'react'
 
 import socket from '@/lib/socket'
+import { UpdateOrderResType } from '@/lib/schema/order.schema'
 import { useGuestGetOrdersQuery } from '@/lib/tanstack-query/use-guest'
 import { formatCurrency, getVietnameseOrderStatus } from '@/utils'
 import { Badge } from '@/components/ui/badge'
-import { UpdateOrderResType } from '@/lib/schema/order.schema'
 
 export default function OrdersCart() {
   const { data, isSuccess, refetch } = useGuestGetOrdersQuery()
@@ -33,8 +34,12 @@ export default function OrdersCart() {
       console.log('disconnected')
     }
 
-    function onOrderCreated(_data: UpdateOrderResType['data']) {
+    function onOrderCreated(data: UpdateOrderResType['data']) {
       refetch()
+      toast.success(
+        `Món ăn ${data.dishSnapshot.name} vừa được cập nhật trạng thái sang ${getVietnameseOrderStatus(data.status).toLocaleLowerCase()}`,
+        { id: data.id }
+      )
     }
 
     socket.on('update-order', onOrderCreated)

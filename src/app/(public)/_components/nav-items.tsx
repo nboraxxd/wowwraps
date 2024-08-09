@@ -12,6 +12,18 @@ import { handleErrorApi } from '@/utils/error'
 import { useAuthStore } from '@/lib/stores/auth-store'
 import { useLogoutToServerMutation } from '@/lib/tanstack-query/use-auth'
 import { useGuestLogoutToServerMutation } from '@/lib/tanstack-query/use-guest'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { buttonVariants } from '@/components/ui/button'
 
 const menuItems: {
   title: string
@@ -89,9 +101,25 @@ export default function NavItems({ className }: { className?: string }) {
         ) : null
       })}
       {role ? (
-        <button className={cn('text-left', className)} onClick={handleLogout}>
-          Đăng xuất
-        </button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button className={cn('text-left', className)}>Đăng xuất</button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất không?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Các món ăn trong giỏ hàng sẽ bị xóa hết, bạn có chắc chắn muốn đăng xuất không?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Huỷ</AlertDialogCancel>
+              <AlertDialogAction onClick={handleLogout} className={cn(buttonVariants({ variant: 'destructive' }))}>
+                Đăng xuất
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       ) : undefined}
     </>
   )
