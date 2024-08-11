@@ -1,9 +1,10 @@
 'use client'
 
+import { toast } from 'sonner'
 import { useSearchParams } from 'next/navigation'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { endOfDay, format, startOfDay } from 'date-fns'
-import { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import {
   ColumnFiltersState,
   SortingState,
@@ -18,7 +19,8 @@ import {
 
 import { OrderStatusValues } from '@/constants/type'
 import { getVietnameseOrderStatus, cn } from '@/utils'
-import { useGetOrdersQuery } from '@/lib/tanstack-query/use-order'
+import socket from '@/lib/socket'
+import { useGetOrdersQuery, useUpdateOrderMutation } from '@/lib/tanstack-query/use-order'
 import { useGetTablesQuery } from '@/lib/tanstack-query/use-table'
 import { GuestCreateOrdersResType } from '@/lib/schema/guest.schema'
 import { GetOrdersResType, PayGuestOrdersResType, UpdateOrderResType } from '@/lib/schema/order.schema'
@@ -34,6 +36,7 @@ import orderTableColumns from '@/app/manage/orders/order-table-columns'
 import { useOrderService } from '@/app/manage/orders/order.service'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { AutoPagination } from '@/components/common'
+import { handleErrorApi } from '@/utils/error'
 
 export type StatusCountObject = Record<(typeof OrderStatusValues)[number], number>
 export type Statics = {
@@ -44,9 +47,9 @@ export type OrderObjectByGuestID = Record<number, GetOrdersResType['data']>
 export type ServingGuestByTableNumber = Record<number, OrderObjectByGuestID>
 
 export const OrderTableContext = createContext({
-  setOrderIdEdit: (value: number | undefined) => {},
+  setOrderIdEdit: (_value: number | undefined) => {},
   orderIdEdit: undefined as number | undefined,
-  changeStatus: (payload: {
+  changeStatus: (_payload: {
     orderId: number
     dishId: number
     status: (typeof OrderStatusValues)[number]
@@ -77,10 +80,16 @@ export default function OrderTable() {
     pageSize: PAGE_SIZE, // default page size
   })
 
-  const ordersQuery = useGetOrdersQuery({ fromDate, toDate })
+  const {
+    isLoading: isLoadingGetOrders,
+    isSuccess: isSuccessGetOrders,
+    data: dataGetOrders,
+    refetch: refetchGetOrders,
+  } = useGetOrdersQuery({ fromDate, toDate })
   const tablesQuery = useGetTablesQuery()
+  const updateOrderMutation = useUpdateOrderMutation()
 
-  const orderList = ordersQuery.data?.payload.data ?? []
+  const orderList = isSuccessGetOrders ? dataGetOrders.payload.data : []
   const tableList = tablesQuery.data?.payload.data ?? []
   const tableListSortedByNumber = tableList.sort((a, b) => a.number - b.number)
 
@@ -91,7 +100,13 @@ export default function OrderTable() {
     dishId: number
     status: (typeof OrderStatusValues)[number]
     quantity: number
-  }) => {}
+  }) => {
+    try {
+      await updateOrderMutation.mutateAsync(body)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
 
   const table = useReactTable({
     data: orderList,
@@ -126,6 +141,55 @@ export default function OrderTable() {
     setFromDate(initFromDate)
     setToDate(initToDate)
   }
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+
+    function onConnect() {
+      console.log('connected', socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('disconnected')
+    }
+
+    function refetch() {
+      const now = new Date()
+      if (now >= fromDate && now <= toDate) {
+        refetchGetOrders()
+      }
+    }
+
+    function onUpdateOrder(data: UpdateOrderResType['data']) {
+      refetch()
+      toast.success(
+        `Món ăn ${data.dishSnapshot.name} vừa được cập nhật trạng thái sang ${getVietnameseOrderStatus(data.status).toLocaleLowerCase()}`,
+        { id: data.id }
+      )
+    }
+
+    function onCreateOrder(data: GuestCreateOrdersResType['data']) {
+      const { guest } = data[0]
+
+      refetch()
+      toast.success(`${guest?.name} tại bàn ${guest?.tableNumber} vừa đặt ${data.length} đơn`, { id: guest?.id })
+    }
+
+    socket.on('update-order', onUpdateOrder)
+    socket.on('new-order', onCreateOrder)
+
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+
+    return () => {
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('update-order', onUpdateOrder)
+      socket.off('new-order', onCreateOrder)
+    }
+  }, [fromDate, refetchGetOrders, toDate])
 
   return (
     <OrderTableContext.Provider
@@ -233,8 +297,8 @@ export default function OrderTable() {
           tableList={tableListSortedByNumber}
           servingGuestByTableNumber={servingGuestByTableNumber}
         />
-        {ordersQuery.isLoading ? <TableSkeleton /> : null}
-        {ordersQuery.isSuccess ? (
+        {isLoadingGetOrders ? <TableSkeleton /> : null}
+        {isSuccessGetOrders ? (
           <div className="rounded-md border">
             <Table>
               <TableHeader>

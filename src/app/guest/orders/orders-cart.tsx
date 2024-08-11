@@ -34,15 +34,14 @@ export default function OrdersCart() {
       console.log('disconnected')
     }
 
-    function onOrderCreated(data: UpdateOrderResType['data']) {
+    function onUpdateOrder(data: UpdateOrderResType['data']) {
       refetch()
       toast.success(
-        `Món ăn ${data.dishSnapshot.name} vừa được cập nhật trạng thái sang ${getVietnameseOrderStatus(data.status).toLocaleLowerCase()}`,
-        { id: data.id }
+        `Món ăn ${data.dishSnapshot.name} vừa được cập nhật trạng thái sang ${getVietnameseOrderStatus(data.status).toLocaleLowerCase()}`
       )
     }
 
-    socket.on('update-order', onOrderCreated)
+    socket.on('update-order', onUpdateOrder)
 
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
@@ -50,6 +49,7 @@ export default function OrdersCart() {
     return () => {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
+      socket.off('update-order', onUpdateOrder)
     }
   }, [refetch])
 

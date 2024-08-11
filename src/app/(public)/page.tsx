@@ -34,7 +34,7 @@ export default async function Homepage() {
           className="absolute left-0 top-0 size-full object-cover"
           priority
         />
-        <div className="relative z-20 px-4 py-10 sm:px-10 md:p-20">
+        <div className="relative z-20 px-4 py-10 text-white sm:px-10 md:p-20">
           <h1 className="text-center text-xl font-bold sm:text-2xl md:text-4xl lg:text-5xl">Wowwraps restaurant</h1>
           <p className="mt-4 text-center text-sm sm:text-base">Món ăn ngon, giá cả hợp lý, phục vụ nhanh chóng</p>
         </div>

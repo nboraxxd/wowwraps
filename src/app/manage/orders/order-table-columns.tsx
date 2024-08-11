@@ -118,6 +118,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
     header: 'Trạng thái',
     cell: function Cell({ row }) {
       const { changeStatus } = useContext(OrderTableContext)
+
       const changeOrderStatus = async (status: (typeof OrderStatusValues)[number]) => {
         changeStatus({
           orderId: row.original.id,
