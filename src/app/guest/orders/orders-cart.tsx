@@ -4,10 +4,11 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 import { useEffect, useMemo } from 'react'
 
-import socket from '@/lib/socket'
-import { UpdateOrderResType } from '@/lib/schema/order.schema'
-import { useGuestGetOrdersQuery } from '@/lib/tanstack-query/use-guest'
+import { OrderStatus } from '@/constants/type'
 import { formatCurrency, getVietnameseOrderStatus } from '@/utils'
+import socket from '@/lib/socket'
+import { useGuestGetOrdersQuery } from '@/lib/tanstack-query/use-guest'
+import { PayGuestOrdersResType, UpdateOrderResType } from '@/lib/schema/order.schema'
 import { Badge } from '@/components/ui/badge'
 
 export default function OrdersCart() {
@@ -15,10 +16,44 @@ export default function OrdersCart() {
 
   const orders = useMemo(() => (isSuccess ? data.payload.data : []), [data?.payload.data, isSuccess])
 
-  const totalPrice = useMemo(() => {
-    return orders.reduce((acc, order) => {
-      return acc + order.quantity * order.dishSnapshot.price
-    }, 0)
+  const { unpaid, paid } = useMemo(() => {
+    return orders.reduce(
+      (acc, order) => {
+        if (
+          order.status === OrderStatus.Delivered ||
+          order.status === OrderStatus.Pending ||
+          order.status === OrderStatus.Processing
+        ) {
+          return {
+            ...acc,
+            unpaid: {
+              price: acc.unpaid.price + order.quantity * order.dishSnapshot.price,
+              quantity: acc.unpaid.quantity + order.quantity,
+            },
+          }
+        } else if (order.status === OrderStatus.Paid) {
+          return {
+            ...acc,
+            paid: {
+              price: acc.paid.price + order.quantity * order.dishSnapshot.price,
+              quantity: acc.paid.quantity + order.quantity,
+            },
+          }
+        }
+
+        return acc
+      },
+      {
+        unpaid: {
+          price: 0,
+          quantity: 0,
+        },
+        paid: {
+          price: 0,
+          quantity: 0,
+        },
+      }
+    )
   }, [orders])
 
   useEffect(() => {
@@ -41,7 +76,13 @@ export default function OrdersCart() {
       )
     }
 
+    function onPayment(data: PayGuestOrdersResType['data']) {
+      refetch()
+      toast.success(`Đã thanh toán thành công ${data.length} đơn`)
+    }
+
     socket.on('update-order', onUpdateOrder)
+    socket.on('payment', onPayment)
 
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
@@ -50,6 +91,7 @@ export default function OrdersCart() {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
       socket.off('update-order', onUpdateOrder)
+      socket.off('payment', onPayment)
     }
   }, [refetch])
 
@@ -82,13 +124,22 @@ export default function OrdersCart() {
         </div>
       ))}
       <div className="sticky bottom-0 min-w-[331px] bg-background">
-        <div className="flex justify-between border-t p-4">
-          <div>
-            Tổng đơn <span className="text-sm">({orders.reduce((acc, order) => acc + order.quantity, 0)} món)</span>
+        {unpaid.quantity > 0 ? (
+          <div className="flex justify-between border-t p-4">
+            <div>
+              Chưa thanh toán <span className="text-sm">({unpaid.quantity} món)</span>
+            </div>
+            <span className="text-sm font-semibold">{formatCurrency(unpaid.price)}</span>
           </div>
-
-          <span className="text-sm font-semibold">{formatCurrency(totalPrice)}</span>
-        </div>
+        ) : null}
+        {paid.quantity > 0 ? (
+          <div className="flex justify-between border-t p-4">
+            <div>
+              Đã thanh toán <span className="text-sm">({paid.quantity} món)</span>
+            </div>
+            <span className="text-sm font-semibold">{formatCurrency(paid.price)}</span>
+          </div>
+        ) : null}
       </div>
     </>
   )

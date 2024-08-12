@@ -25,3 +25,9 @@ export function useUpdateOrderMutation() {
       orderApi.updateOrderFromBrowserToBackend(orderId, body),
   })
 }
+
+export function usePayGuestOrdersMutation() {
+  return useMutation({
+    mutationFn: orderApi.payGuestOrders,
+  })
+}

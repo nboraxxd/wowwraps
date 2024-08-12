@@ -8,18 +8,41 @@ import {
   formatDateTimeToTimeString,
   getVietnameseOrderStatus,
 } from '@/utils'
+import { handleErrorApi } from '@/utils/error'
 import { OrderStatus } from '@/constants/type'
-import { GetOrdersResType } from '@/lib/schema/order.schema'
+import { usePayGuestOrdersMutation } from '@/lib/tanstack-query/use-order'
+import { GetOrdersResType, PayGuestOrdersResType } from '@/lib/schema/order.schema'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
 type Guest = GetOrdersResType['data'][0]['guest']
 type Orders = GetOrdersResType['data']
-export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orders: Orders }) {
+interface Props {
+  guest: Guest
+  orders: Orders
+  onPaySuccess?: (data: PayGuestOrdersResType) => void
+}
+
+export default function OrderGuestDetail({ guest, orders, onPaySuccess }: Props) {
   const ordersFilterToPurchase = guest
     ? orders.filter((order) => order.status !== OrderStatus.Paid && order.status !== OrderStatus.Rejected)
     : []
+
   const purchasedOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
+
+  const payGuestOrdersMutation = usePayGuestOrdersMutation()
+
+  const handlePayAll = async () => {
+    if (payGuestOrdersMutation.isPending || !guest) return
+
+    try {
+      const response = await payGuestOrdersMutation.mutateAsync({ guestId: guest.id })
+      onPaySuccess && onPaySuccess(response.payload)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
   return (
     <div className="space-y-2 text-sm">
       {guest && (
@@ -116,7 +139,13 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       </div>
 
       <div>
-        <Button className="w-full" size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0}>
+        <Button
+          className="w-full"
+          size={'sm'}
+          variant={'secondary'}
+          disabled={ordersFilterToPurchase.length === 0 || payGuestOrdersMutation.isPending || !guest}
+          onClick={handlePayAll}
+        >
           Thanh toán tất cả ({ordersFilterToPurchase.length} đơn)
         </Button>
       </div>

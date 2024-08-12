@@ -165,8 +165,7 @@ export default function OrderTable() {
     function onUpdateOrder(data: UpdateOrderResType['data']) {
       refetch()
       toast.success(
-        `Món ăn ${data.dishSnapshot.name} vừa được cập nhật trạng thái sang ${getVietnameseOrderStatus(data.status).toLocaleLowerCase()}`,
-        { id: data.id }
+        `Món ăn ${data.dishSnapshot.name} vừa được cập nhật trạng thái sang ${getVietnameseOrderStatus(data.status).toLocaleLowerCase()}`
       )
     }
 
@@ -174,11 +173,19 @@ export default function OrderTable() {
       const { guest } = data[0]
 
       refetch()
-      toast.success(`${guest?.name} tại bàn ${guest?.tableNumber} vừa đặt ${data.length} đơn`, { id: guest?.id })
+      toast.success(`${guest?.name} tại bàn ${guest?.tableNumber} vừa đặt ${data.length} đơn`)
+    }
+
+    function onPayment(data: PayGuestOrdersResType['data']) {
+      const { guest } = data[0]
+
+      refetch()
+      toast.success(`${guest?.name} tại bàn ${guest?.tableNumber} vừa thanh toán ${data.length} đơn`)
     }
 
     socket.on('update-order', onUpdateOrder)
     socket.on('new-order', onCreateOrder)
+    socket.on('payment', onPayment)
 
     socket.on('connect', onConnect)
     socket.on('disconnect', onDisconnect)
@@ -188,6 +195,7 @@ export default function OrderTable() {
       socket.off('disconnect', onDisconnect)
       socket.off('update-order', onUpdateOrder)
       socket.off('new-order', onCreateOrder)
+      socket.off('payment', onPayment)
     }
   }, [fromDate, refetchGetOrders, toDate])
 

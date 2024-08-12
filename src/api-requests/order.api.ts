@@ -6,6 +6,8 @@ import {
   GetOrdersQueryParamsType,
   GetOrdersResType,
   OrderParamType,
+  PayGuestOrdersBodyType,
+  PayGuestOrdersResType,
   UpdateOrderBodyType,
   UpdateOrderResType,
 } from '@/lib/schema/order.schema'
@@ -25,6 +27,8 @@ const orderApi = {
     http.put<UpdateOrderResType>(`${PREFIX}/${orderId}`, body),
 
   getOrderDetailFromBrowserToBackend: (oderId: number) => http.get<GetOrderDetailResType>(`${PREFIX}/${oderId}`),
+
+  payGuestOrders: (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>(`${PREFIX}/pay`, body),
 }
 
 export default orderApi

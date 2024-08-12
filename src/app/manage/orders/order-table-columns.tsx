@@ -24,6 +24,7 @@ import { OrderTableContext } from '@/app/manage/orders/order-table'
 import OrderGuestDetail from '@/app/manage/orders/order-guest-detail'
 
 type OrderItem = GetOrdersResType['data'][0]
+
 const orderTableColumns: ColumnDef<OrderItem>[] = [
   {
     accessorKey: 'tableNumber',
@@ -40,6 +41,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
     cell: function Cell({ row }) {
       const { orderObjectByGuestId } = useContext(OrderTableContext)
       const guest = row.original.guest
+
       return (
         <div>
           {!guest && (
