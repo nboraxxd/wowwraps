@@ -20,6 +20,41 @@ jobs:
         run: echo "${{secrets.ENV_PRODUCTION}}" > .env
       - run: npm i --force
       - run: npm run build
+
+      - name: send Telegram message after build
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            🎉 Build successfully completed!
+
+            ${{ github.actor }} created commit:
+
+            Commit message: ${{ github.event.commits[0].message }}
+
+            Repository: ${{ github.repository }}
+
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+
+      - name: send Telegram message after build
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            😢 Build failed!
+
+            ${{ github.actor }} created commit:
+
+            Commit message: ${{ github.event.commits[0].message }}
+
+            Repository: ${{ github.repository }}
+
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -42,3 +77,37 @@ jobs:
             npx prisma generate
             npm run build
             pm2 restart wowwraps-next14
+
+      - name: send Telegram message after deploy
+        if: success()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            🛹 Deploy successfully completed!
+
+            ${{ github.actor }} created commit:
+
+            Commit message: ${{ github.event.commits[0].message }}
+
+            Repository: ${{ github.repository }}
+
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+
+      - name: send Telegram message after deploy
+        if: failure()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            💣 Deploy failed!
+
+            ${{ github.actor }} created commit:
+
+            Commit message: ${{ github.event.commits[0].message }}
+
+            Repository: ${{ github.repository }}
+
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
