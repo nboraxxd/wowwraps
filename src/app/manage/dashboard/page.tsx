@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 import accountApi from '@/api-requests/account.api'
 import { Button } from '@/components/ui/button'

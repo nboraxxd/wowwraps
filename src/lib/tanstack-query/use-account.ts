@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import accountApi from '@/api-requests/account.api'
 import { QueryKey } from '@/constants/query-key'
-import { AccountIdParamType, AccountResType, UpdateEmployeeAccountBodyType } from '@/lib/schema/account.schema'
+import {
+  AccountIdParamType,
+  AccountResType,
+  GetGuestListQueryParamsType,
+  UpdateEmployeeAccountBodyType,
+} from '@/lib/schema/account.schema'
 
 type GetMeQueryOptions = {
   onSuccess?: (data: AccountResType) => void
@@ -100,5 +105,18 @@ export function useDeleteEmployeeMutation() {
         queryKey: [QueryKey.getEmployees],
       })
     },
+  })
+}
+
+export function useGetGuestsQuery(queryParams: GetGuestListQueryParamsType) {
+  return useQuery({
+    queryFn: () => accountApi.getGuestsFromBrowserToBackend(queryParams),
+    queryKey: [QueryKey.getGuests, queryParams],
+  })
+}
+
+export function useCreateGuestMutation() {
+  return useMutation({
+    mutationFn: accountApi.createGuestFromBrowserToBackend,
   })
 }

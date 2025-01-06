@@ -16,6 +16,7 @@ export const QueryKey = {
   getEmployee: 'getEmployee',
   updateEmployee: 'updateEmployee',
   deleteEmployee: 'deleteEmployee',
+  getGuests: 'getGuests',
 
   // Dish API
   getDishes: 'getDishes',

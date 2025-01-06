@@ -1,3 +1,5 @@
+import queryString from 'query-string'
+
 import http from '@/utils/http'
 import {
   AccountIdParamType,
@@ -5,6 +7,10 @@ import {
   AccountResType,
   ChangePasswordBodyType,
   CreateEmployeeAccountBodyType,
+  CreateGuestBodyType,
+  CreateGuestResType,
+  GetGuestListQueryParamsType,
+  GetListGuestsResType,
   UpdateEmployeeAccountBodyType,
   UpdateMeBodyType,
 } from '@/lib/schema/account.schema'
@@ -36,6 +42,14 @@ const accountApi = {
 
   deleteEmployeeFromBrowserToBackend: (id: AccountIdParamType['id']) =>
     http.delete<AccountResType>(`${PREFIX}/detail/${id}`),
+
+  getGuestsFromBrowserToBackend: (queryParams: GetGuestListQueryParamsType) =>
+    http.get<GetListGuestsResType>(
+      `${PREFIX}/guests?${queryString.stringify({ fromDate: queryParams.fromDate?.toISOString(), toDate: queryParams.toDate?.toISOString() })}`
+    ),
+
+  createGuestFromBrowserToBackend: (body: CreateGuestBodyType) =>
+    http.post<CreateGuestResType>(`${PREFIX}/guests`, body),
 
   // API OF NEXT.JS SERVER
 }

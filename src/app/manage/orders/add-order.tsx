@@ -24,9 +24,9 @@ import { TablesDialog } from '@/app/manage/orders/tables-dialog'
 
 export default function AddOrder() {
   const [open, setOpen] = useState(false)
-  const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const [isNewGuest, setIsNewGuest] = useState(true)
   const [orders, setOrders] = useState<CreateOrdersBodyType['orders']>([])
+  const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const dishes: DishListResType['data'] = []
 
   const totalPrice = useMemo(() => {

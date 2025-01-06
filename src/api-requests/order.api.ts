@@ -2,6 +2,8 @@ import queryString from 'query-string'
 
 import http from '@/utils/http'
 import {
+  CreateOrdersBodyType,
+  CreateOrdersResType,
   GetOrderDetailResType,
   GetOrdersQueryParamsType,
   GetOrdersResType,
@@ -22,6 +24,8 @@ const orderApi = {
         toDate: queryParams.toDate?.toISOString(),
       })}`
     ),
+
+  createOrderFromBrowserToBackend: (body: CreateOrdersBodyType) => http.post<CreateOrdersResType>(PREFIX, body),
 
   updateOrderFromBrowserToBackend: (orderId: OrderParamType['orderId'], body: UpdateOrderBodyType) =>
     http.put<UpdateOrderResType>(`${PREFIX}/${orderId}`, body),

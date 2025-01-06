@@ -19,6 +19,12 @@ export function useGetOrderDetailQuery(orderId: OrderParamType['orderId'], enabl
   })
 }
 
+export function useCreateOrderMutation() {
+  return useMutation({
+    mutationFn: orderApi.createOrderFromBrowserToBackend,
+  })
+}
+
 export function useUpdateOrderMutation() {
   return useMutation({
     mutationFn: ({ orderId, ...body }: UpdateOrderBodyType & { orderId: OrderParamType['orderId'] }) =>

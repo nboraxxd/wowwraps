@@ -14,12 +14,14 @@ import {
 
 import { TableStatus } from '@/constants/type'
 import { TableListResType } from '@/lib/schema/table.schema'
+import { useGetTablesQuery } from '@/lib/tanstack-query/use-table'
 import { cn, getVietnameseTableStatus, simpleMatchText } from '@/utils'
+
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AutoPagination } from '@/components/common'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 
 type TableItem = TableListResType['data'][0]
 
@@ -58,10 +60,11 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
     pageSize: PAGE_SIZE, // default page size
   })
 
-  const data: TableListResType['data'] = []
+  const { data, isSuccess } = useGetTablesQuery()
+  const tablesResponse: TableListResType['data'] = isSuccess ? data.payload.data : []
 
   const table = useReactTable({
-    data,
+    data: tablesResponse,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -171,7 +174,7 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="flex-1 py-4 text-xs text-muted-foreground ">
                 Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{' '}
-                <strong>{data.length}</strong> kết quả
+                <strong>{tablesResponse.length}</strong> kết quả
               </div>
               <div>
                 <AutoPagination
