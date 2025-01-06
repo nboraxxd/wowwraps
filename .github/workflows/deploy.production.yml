@@ -21,14 +21,14 @@ jobs:
       - run: npm i --force
       - run: npm run build
 
-      - name: send Telegram message after build
+      - name: send Telegram message after build if success
         if: success()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            🎉 Build successfully completed!
+            🎉 Build Next.js app successfully completed!
 
             ${{ github.actor }} created commit:
 
@@ -38,14 +38,14 @@ jobs:
 
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
 
-      - name: send Telegram message after build
+      - name: send Telegram message after build if failure
         if: failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            😢 Build failed!
+            😢 Build Next.js app failed!
 
             ${{ github.actor }} created commit:
 
@@ -78,14 +78,14 @@ jobs:
             npm run build
             pm2 restart wowwraps-next14
 
-      - name: send Telegram message after deploy
+      - name: send Telegram message after deploy if success
         if: success()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            🛹 Deploy successfully completed!
+            🛹 Deploy Next.js app successfully completed!
 
             ${{ github.actor }} created commit:
 
@@ -95,14 +95,14 @@ jobs:
 
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
 
-      - name: send Telegram message after deploy
+      - name: send Telegram message after deploy if failure
         if: failure()
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            💣 Deploy failed!
+            💣 Deploy Next.js app failed!
 
             ${{ github.actor }} created commit:
 
