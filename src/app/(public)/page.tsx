@@ -39,31 +39,33 @@ export default async function Homepage() {
           <p className="mt-4 text-center text-sm sm:text-base">Món ăn ngon, giá cả hợp lý, phục vụ nhanh chóng</p>
         </div>
       </section>
-      <section className="space-y-10 py-16">
-        <h2 className="text-center text-2xl font-bold">Đa dạng các món ăn</h2>
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {dishes.map((dish) => (
-            <div className="flex gap-4" key={dish.id}>
-              <div className="shrink-0">
-                <Image
-                  src={dish.image}
-                  alt={dish.name}
-                  width={150}
-                  height={150}
-                  quality={90}
-                  className="size-[150px] rounded-md object-cover"
-                  priority
-                />
+      <main className="flex flex-1 flex-col gap-4 px-4 md:gap-8 md:px-8">
+        <section className="space-y-10 py-16">
+          <h2 className="text-center text-2xl font-bold">Đa dạng các món ăn</h2>
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {dishes.map((dish) => (
+              <div className="flex gap-4" key={dish.id}>
+                <div className="shrink-0">
+                  <Image
+                    src={dish.image}
+                    alt={dish.name}
+                    width={150}
+                    height={150}
+                    quality={90}
+                    className="size-[150px] rounded-md object-cover"
+                    priority
+                  />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-xl font-semibold">{dish.name}</h3>
+                  <p className="">{dish.description}</p>
+                  <p className="font-semibold">{formatCurrency(dish.price)}</p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <h3 className="text-xl font-semibold">{dish.name}</h3>
-                <p className="">{dish.description}</p>
-                <p className="font-semibold">{formatCurrency(dish.price)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      </main>
     </>
   )
 }
